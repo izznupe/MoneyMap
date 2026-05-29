@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pre-FC & Surplus Funds Map</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--surface3:#2d333b;
+  --border:rgba(255,255,255,0.08);--text:#e6edf3;--muted:#8b949e;
+  --accent:#58a6ff;--red:#f85149;--yellow:#d29922;--green:#3fb950;--orange:#e07b39;--gold:#ffd700;
+  --red-bg:rgba(248,81,73,0.12);--yellow-bg:rgba(210,153,34,0.12);
+  --green-bg:rgba(63,185,80,0.12);--orange-bg:rgba(224,123,57,0.12);--gold-bg:rgba(255,215,0,0.1);
+  --radius:8px;--panel:380px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:100;}
+.logo{font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);}
+.header-stats{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;}
+.stat-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
+.pill-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,0.3);}
+.pill-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(210,153,34,0.3);}
+.pill-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(63,185,80,0.3);}
+.pill-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
+.main{display:flex;flex:1;overflow:hidden;}
+#map{flex:1;position:relative;background:#1a1f2e;}
+.map-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);}
+.map-placeholder h2{font-size:16px;font-weight:500;color:var(--muted);}
+.map-placeholder p{font-size:12px;color:var(--muted);opacity:0.7;text-align:center;max-width:260px;line-height:1.5;}
+.api-input-row{display:flex;gap:8px;align-items:center;}
+.api-input-row input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:13px;width:250px;}
+.api-input-row input::placeholder{color:var(--muted);}
+.btn{background:var(--accent);color:#000;border:none;padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn:hover{opacity:0.85;}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface3);}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,0.3);}
+.btn-orange{background:var(--orange-bg);color:var(--orange);border:1px solid rgba(224,123,57,0.3);}
+.btn-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-xs{padding:3px 7px;font-size:11px;}
+.sidebar{width:var(--panel);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{flex:1;padding:9px 2px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;text-align:center;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-content{display:none;flex:1;overflow-y:auto;padding:12px;}
+.tab-content.active{display:block;}
+.upload-section{margin-bottom:12px;}
+.upload-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-red{background:var(--red);}.dot-yellow{background:var(--yellow);}.dot-green{background:var(--green);}.dot-orange{background:var(--orange);}.dot-gold{background:var(--gold);}
+.upload-drop{border:1px dashed var(--border);border-radius:var(--radius);padding:11px;text-align:center;cursor:pointer;position:relative;transition:all 0.15s;}
+.upload-drop:hover{border-color:var(--accent);background:rgba(88,166,255,0.04);}
+.upload-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-text{font-size:12px;color:var(--muted);pointer-events:none;}
+.upload-name{font-size:12px;color:var(--green);font-weight:500;pointer-events:none;}
+.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:7px;}
+.filter-row{display:flex;gap:6px;margin-bottom:7px;align-items:center;}
+.filter-row label{font-size:11px;color:var(--muted);white-space:nowrap;min-width:56px;}
+.filter-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 9px;border-radius:var(--radius);font-size:12px;}
+.filter-input::placeholder{color:var(--muted);}
+.filter-input:focus{outline:none;border-color:var(--accent);}
+.filter-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.chip{padding:4px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all 0.15s;}
+.chip-red{background:var(--red-bg);color:var(--red);border-color:rgba(248,81,73,0.3);}
+.chip-yellow{background:var(--yellow-bg);color:var(--yellow);border-color:rgba(210,153,34,0.3);}
+.chip-green{background:var(--green-bg);color:var(--green);border-color:rgba(63,185,80,0.3);}
+.chip-gold{background:var(--gold-bg);color:var(--gold);border-color:rgba(255,215,0,0.3);}
+.chip.off{opacity:0.3;}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+.tier-banner{background:var(--gold-bg);border:1px solid rgba(255,215,0,0.25);border-radius:var(--radius);padding:9px 12px;margin-bottom:10px;font-size:12px;color:var(--gold);line-height:1.5;}
+.tier-banner strong{display:block;margin-bottom:2px;font-size:13px;}
+.property-list{display:flex;flex-direction:column;gap:7px;}
+.property-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;transition:border-color 0.15s;}
+.property-card.tier1{border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.04);}
+.property-card.in-route{border-color:var(--green);}
+.property-card.outlier{border-color:var(--orange);}
+.pc-header{display:flex;align-items:flex-start;gap:8px;margin-bottom:3px;}
+.pc-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.pc-address{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;flex:1;}
+.pc-name{font-size:11px;color:var(--muted);margin-bottom:4px;margin-left:16px;}
+.pc-meta{display:flex;gap:5px;flex-wrap:wrap;margin-left:16px;margin-bottom:5px;}
+.pc-tag{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.pc-actions{display:flex;gap:4px;margin-left:16px;flex-wrap:wrap;}
+.status-bar{display:flex;gap:3px;margin-left:16px;margin-top:5px;flex-wrap:wrap;}
+.status-btn{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface3);color:var(--muted);transition:all 0.12s;}
+.status-answered.active-status{background:var(--green-bg);color:var(--green);border-color:rgba(63,185,80,0.4);}
+.status-nothome.active-status{background:var(--surface3);color:var(--text);border-color:var(--muted);}
+.status-notint.active-status{background:var(--red-bg);color:var(--red);border-color:rgba(248,81,73,0.4);}
+.status-callback.active-status{background:var(--yellow-bg);color:var(--yellow);border-color:rgba(210,153,34,0.4);}
+.status-signed.active-status{background:rgba(88,166,255,0.15);color:var(--accent);border-color:rgba(88,166,255,0.4);}
+.note-display{font-size:11px;color:var(--muted);font-style:italic;margin-left:16px;margin-top:3px;line-height:1.4;}
+.note-row{margin-left:16px;margin-top:5px;display:none;}
+.note-input{width:100%;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:11px;resize:none;font-family:inherit;}
+.note-input:focus{outline:none;border-color:var(--accent);}
+.route-list{display:flex;flex-direction:column;gap:6px;}
+.route-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;display:flex;align-items:center;gap:10px;}
+.route-item.tier1-route{border-color:rgba(255,215,0,0.4);}
+.route-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#000;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.route-num.gold-num{background:var(--gold);color:#000;}
+.route-info{flex:1;min-width:0;}
+.route-addr{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.route-sub{font-size:11px;color:var(--muted);}
+.route-actions-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.chunk-bar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px;}
+.chunk-bar-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:7px;}
+.chunk-nav{display:flex;gap:6px;flex-wrap:wrap;}
+.chunk-btn{padding:5px 11px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;text-align:center;}
+.chunk-btn.active-chunk{background:var(--accent);color:#000;border-color:var(--accent);}
+.chunk-info{font-size:11px;color:var(--muted);margin-top:6px;}
+.loc-status{font-size:11px;padding:4px 8px;border-radius:4px;margin-bottom:8px;display:none;}
+.loc-status.show{display:block;}
+.loc-ok{background:var(--green-bg);color:var(--green);}
+.loc-err{background:var(--red-bg);color:var(--red);}
+.alert-bar{border-radius:var(--radius);padding:9px 12px;margin-bottom:9px;font-size:12px;line-height:1.5;display:none;}
+.alert-bar.show{display:block;}
+.alert-orange{background:var(--orange-bg);border:1px solid rgba(224,123,57,0.3);color:var(--orange);}
+.alert-yellow{background:var(--yellow-bg);border:1px solid rgba(210,153,34,0.3);color:var(--yellow);}
+.empty-state{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px;line-height:1.6;}
+.map-controls{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:10;}
+.map-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.map-btn:hover{border-color:var(--accent);color:var(--accent);}
+.map-btn.active{background:rgba(88,166,255,0.12);border-color:var(--accent);color:var(--accent);}
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+.popup-overlay.open{display:flex;}
+.popup{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+.popup-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.popup-type-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.popup-title{flex:1;}
+.popup-title h3{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:2px;}
+.popup-type-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+.popup-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px;line-height:1;}
+.popup-body{padding:14px 16px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.detail-item label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:2px;}
+.detail-item .val{font-size:13px;font-weight:500;color:var(--text);display:block;}
+.val-green{color:var(--green)!important;}.val-red{color:var(--red)!important;}.val-yellow{color:var(--yellow)!important;}.val-gold{color:var(--gold)!important;}
+.detail-full{grid-column:1/-1;}
+.contact-section,.field-notes-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.contact-section h4,.field-notes-section h4{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:7px;}
+.phone-list{display:flex;flex-direction:column;gap:4px;margin-bottom:7px;}
+.phone-row{display:flex;align-items:center;gap:7px;font-size:12px;}
+.phone-row a{color:var(--accent);text-decoration:none;font-weight:500;}
+.phone-badge{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--surface2);color:var(--muted);}
+.dnc-badge{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--red-bg);color:var(--red);}
+.email-list a{font-size:11px;color:var(--accent);text-decoration:none;opacity:0.8;display:block;}
+.field-status-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.fstatus-btn{font-size:11px;padding:4px 9px;border-radius:6px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all 0.15s;}
+.fstatus-btn.selected{border-color:transparent;}
+.fstatus-answered.selected{background:var(--green-bg);color:var(--green);}
+.fstatus-nothome.selected{background:var(--surface3);color:var(--text);}
+.fstatus-notint.selected{background:var(--red-bg);color:var(--red);}
+.fstatus-callback.selected{background:var(--yellow-bg);color:var(--yellow);}
+.fstatus-signed.selected{background:rgba(88,166,255,0.15);color:var(--accent);}
+.field-notes-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:var(--radius);font-size:12px;resize:vertical;min-height:65px;font-family:inherit;}
+.field-notes-input:focus{outline:none;border-color:var(--accent);}
+.popup-footer{padding:11px 16px;border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap;}
+.legend{position:absolute;bottom:20px;left:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 13px;z-index:10;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.legend-item:last-child{margin-bottom:0;}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.kpi-card{background:var(--surface2);border-radius:var(--radius);padding:11px;text-align:center;}
+.kpi-val{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
+.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-top:3px;}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.bar-chart{margin-bottom:12px;}
+.bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.bar-label{font-size:11px;color:var(--muted);width:90px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;background:var(--surface3);border-radius:4px;height:15px;position:relative;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+.bar-count{font-size:10px;color:var(--text);position:absolute;right:5px;top:50%;transform:translateY(-50%);font-weight:600;}
+.age-badge{font-size:10px;padding:1px 5px;border-radius:3px;font-weight:600;margin-left:3px;}
+.age-fresh{background:var(--green-bg);color:var(--green);}
+.age-mid{background:var(--yellow-bg);color:var(--yellow);}
+.age-old{background:var(--red-bg);color:var(--red);}
+.results-count{font-size:11px;color:var(--muted);margin-bottom:8px;padding:4px 8px;background:var(--surface2);border-radius:4px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;font-size:13px;z-index:2000;transform:translateY(80px);opacity:0;transition:all 0.25s;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:rgba(63,185,80,0.4);color:var(--green);}
+.toast.error{border-color:rgba(248,81,73,0.4);color:var(--red);}
+.toast.warn{border-color:rgba(224,123,57,0.4);color:var(--orange);}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+@media(max-width:640px){:root{--panel:100vw;}.main{flex-direction:column;}#map{height:42vh;flex:none;}.sidebar{width:100%;border-left:none;border-top:1px solid var(--border);}header{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡ Pre-FC &amp; Surplus</div>
+  <div class="header-stats">
+    <span class="stat-pill pill-gold" id="hdr-t1">0 Anchors</span>
+    <span class="stat-pill pill-red" id="hdr-fc">0 FC</span>
+    <span class="stat-pill pill-yellow" id="hdr-auction">0 Auctions</span>
+    <span class="stat-pill pill-green" id="hdr-surplus">0 Surplus</span>
+  </div>
+</header>
+<div class="main">
+  <div id="map">
+    <div class="map-placeholder" id="mapPlaceholder">
+      <svg width="52" height="52" viewBox="0 0 64 64" fill="none"><path d="M32 4C20.95 4 12 12.95 12 24C12 37 32 60 32 60S52 37 52 24C52 12.95 43.05 4 32 4ZM32 31C28.13 31 25 27.87 25 24S28.13 17 32 17 39 20.13 39 24 35.87 31 32 31Z" fill="currentColor" opacity="0.3"/></svg>
+      <h2>Pre-FC &amp; Surplus Map</h2>
+      <p>Enter your Google Maps API key to load the map.</p>
+      <div class="api-input-row">
+        <input type="text" id="apiKeyInput" placeholder="Paste Google Maps API Key..."/>
+        <button class="btn" onclick="initMap()">Load Map</button>
+      </div>
+      <p style="font-size:11px;margin-top:5px;opacity:0.5;">Saved locally — enter once per device.</p>
+    </div>
+    <div class="map-controls" id="mapControls" style="display:none;">
+      <button class="map-btn" onclick="locateMe()">📍 My Location</button>
+      <button class="map-btn" id="btnDraw" onclick="toggleDrawMode('circle')">⭕ Draw Circle</button>
+      <button class="map-btn" id="btnDrawRect" onclick="toggleDrawMode('rectangle')">⬜ Draw Zone</button>
+      <button class="map-btn" onclick="clearZone()">✕ Clear Zone</button>
+    </div>
+    <div class="legend" id="mapLegend" style="display:none;">
+      <div class="legend-item"><span class="dot dot-gold"></span> Tier 1 — $100K+ Surplus (Anchor)</div>
+      <div class="legend-item"><span class="dot dot-green"></span> Surplus Funds</div>
+      <div class="legend-item"><span class="dot dot-yellow"></span> Upcoming Auction</div>
+      <div class="legend-item"><span class="dot dot-red"></span> Foreclosure</div>
+      <div class="legend-item"><span class="dot dot-orange"></span> Zone Outlier</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('data')" id="tab-data">Data</div>
+      <div class="tab" onclick="switchTab('filter')" id="tab-filter">Filters</div>
+      <div class="tab" onclick="switchTab('list')" id="tab-list">List</div>
+      <div class="tab" onclick="switchTab('route')" id="tab-route">Route(<span id="routeCount">0</span>)</div>
+      <div class="tab" onclick="switchTab('kpi')" id="tab-kpi">KPIs</div>
+    </div>
+
+    <!-- DATA TAB -->
+    <div class="tab-content active" id="content-data">
+      <div class="upload-section">
+        <div class="upload-label"><span class="dot dot-green"></span> Surplus Funds CSV</div>
+        <div class="upload-drop"><input type="file" accept=".csv" onchange="loadCSV(event,'surplus')"/><div id="surplus-label" class="upload-text">Tap to upload</div></div>
+      </div>
+      <div class="upload-section">
+        <div class="upload-label"><span class="dot dot-yellow"></span> Upcoming Auctions CSV</div>
+        <div class="upload-drop"><input type="file" accept=".csv" onchange="loadCSV(event,'auction')"/><div id="auction-label" class="upload-text">Tap to upload</div></div>
+      </div>
+      <div class="upload-section">
+        <div class="upload-label"><span class="dot dot-red"></span> Foreclosures / Lis Pendens CSV</div>
+        <div class="upload-drop"><input type="file" accept=".csv" onchange="loadCSV(event,'fc')"/><div id="fc-label" class="upload-text">Tap to upload</div></div>
+      </div>
+      <div id="expiredAlert" class="alert-bar alert-yellow">
+        <strong id="expiredCount"></strong> auctions have already occurred.
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--yellow);color:#000;" onclick="hideExpired()">Hide Past Auctions</button>
+          <button class="btn btn-ghost btn-sm btn" onclick="document.getElementById('expiredAlert').classList.remove('show')">Dismiss</button>
+        </div>
+      </div>
+      <div id="dupAlert" class="alert-bar alert-orange">
+        <strong id="dupCount"></strong> duplicate case numbers merged into single pins.
+        <button class="btn btn-ghost btn-sm btn" style="margin-top:5px;width:100%;" onclick="document.getElementById('dupAlert').classList.remove('show')">OK</button>
+      </div>
+      <div class="divider"></div>
+      <div class="section-title">Show / Hide Types</div>
+      <div class="filter-chips">
+        <span class="chip chip-gold" id="chip-t1" onclick="toggleT1Filter()">★ $100K+ Anchors</span>
+        <span class="chip chip-red" id="chip-fc" onclick="toggleFilter('fc')">Foreclosures</span>
+        <span class="chip chip-yellow" id="chip-auction" onclick="toggleFilter('auction')">Auctions</span>
+        <span class="chip chip-green" id="chip-surplus" onclick="toggleFilter('surplus')">Surplus</span>
+      </div>
+      <div class="divider"></div>
+      <div class="section-title">Data Management</div>
+      <button class="btn btn-danger btn-sm" onclick="clearAllData()" style="width:100%;margin-bottom:5px;">🗑 Clear All Saved Data</button>
+      <p style="font-size:11px;color:var(--muted);line-height:1.5;">Data saves automatically. Notes preserved on clear.</p>
+    </div>
+
+    <!-- FILTER TAB -->
+    <div class="tab-content" id="content-filter">
+      <div class="tier-banner">
+        <strong>★ Tier 1 Anchor Threshold</strong>
+        Surplus claims at or above this amount get gold pins and route priority.
+        <div style="display:flex;gap:6px;margin-top:7px;align-items:center;">
+          <span style="font-size:12px;color:var(--gold);">$</span>
+          <input type="number" class="filter-input" id="tierThreshold" value="100000" min="0" step="10000" onchange="applyFilters()" style="width:120px;"/>
+          <button class="btn btn-gold btn-sm" onclick="applyFilters()">Set</button>
+        </div>
+      </div>
+
+      <div class="section-title">Surplus Amount Range</div>
+      <div class="filter-row">
+        <label>Min $</label>
+        <input type="number" class="filter-input" id="fSurplusMin" placeholder="0" min="0" onchange="applyFilters()"/>
+      </div>
+      <div class="filter-row">
+        <label>Max $</label>
+        <input type="number" class="filter-input" id="fSurplusMax" placeholder="No limit" min="0" onchange="applyFilters()"/>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Auction / Sale Date Range</div>
+      <div class="filter-row">
+        <label>From</label>
+        <input type="date" class="filter-input" id="fDateFrom" onchange="applyFilters()"/>
+      </div>
+      <div class="filter-row">
+        <label>To</label>
+        <input type="date" class="filter-input" id="fDateTo" onchange="applyFilters()"/>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;">
+        <button class="btn btn-ghost btn-xs" onclick="setDatePreset(7)">Next 7 days</button>
+        <button class="btn btn-ghost btn-xs" onclick="setDatePreset(14)">Next 14 days</button>
+        <button class="btn btn-ghost btn-xs" onclick="setDatePreset(21)">Next 21 days</button>
+        <button class="btn btn-ghost btn-xs" onclick="setDatePreset(30)">Next 30 days</button>
+        <button class="btn btn-ghost btn-xs" onclick="clearDates()">Clear Dates</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Address / Location Search</div>
+      <div class="filter-row">
+        <label>Street</label>
+        <input type="text" class="filter-input" id="fStreet" placeholder="e.g. NW 12th" oninput="applyFilters()"/>
+      </div>
+      <div class="filter-row">
+        <label>City</label>
+        <input type="text" class="filter-input" id="fCity" placeholder="e.g. Miami Gardens" oninput="applyFilters()"/>
+      </div>
+      <div class="filter-row">
+        <label>ZIP(s)</label>
+        <input type="text" class="filter-input" id="fZip" placeholder="33309, 33139..." oninput="applyFilters()"/>
+      </div>
+      <div class="filter-row">
+        <label>County</label>
+        <select class="filter-input" id="fCounty" onchange="applyFilters()">
+          <option value="">All Counties</option>
+          <option value="Miami-Dade">Miami-Dade</option>
+          <option value="Broward">Broward</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Surplus Age (days since auction)</div>
+      <div class="filter-row">
+        <label>Max Age</label>
+        <input type="number" class="filter-input" id="fMaxAge" placeholder="90" min="1" onchange="applyFilters()"/>
+        <span style="font-size:11px;color:var(--muted);margin-left:4px;">days</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm" onclick="applyFilters();switchTab('list');" style="flex:1;">Apply &amp; View List</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAllFilters()" style="flex:1;">Reset All Filters</button>
+      </div>
+      <div id="filterSummary" style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;"></div>
+    </div>
+
+    <!-- LIST TAB -->
+    <div class="tab-content" id="content-list">
+      <div id="outlierAlert" class="alert-bar alert-orange">
+        <strong id="outlierCount"></strong> properties may be outside your drawn zone.
+        <div style="display:flex;gap:6px;margin-top:5px;">
+          <button class="btn btn-sm btn-orange" onclick="removeOutliers()">Remove from Route</button>
+          <button class="btn btn-ghost btn-sm btn" onclick="document.getElementById('outlierAlert').classList.remove('show')">Ignore</button>
+        </div>
+      </div>
+      <div class="filter-chips" style="margin-bottom:7px;">
+        <span class="chip chip-gold" id="lchip-t1" onclick="toggleListT1()">★ Anchors</span>
+        <span class="chip chip-red" id="lchip-fc" onclick="toggleListFilter('fc')">FC</span>
+        <span class="chip chip-yellow" id="lchip-auction" onclick="toggleListFilter('auction')">Auctions</span>
+        <span class="chip chip-green" id="lchip-surplus" onclick="toggleListFilter('surplus')">Surplus</span>
+      </div>
+      <div class="filter-row" style="margin-bottom:8px;">
+        <input type="text" class="filter-input" id="searchInput" placeholder="Search address or name..." oninput="renderList()"/>
+      </div>
+      <div id="resultsSummary" class="results-count"></div>
+      <div class="property-list" id="propertyList">
+        <div class="empty-state">Upload CSVs on the Data tab.</div>
+      </div>
+    </div>
+
+    <!-- ROUTE TAB -->
+    <div class="tab-content" id="content-route">
+      <div id="locStatus" class="loc-status"></div>
+      <div class="route-actions-bar">
+        <button class="btn btn-sm" onclick="optimizeFromLocation()">📍 Optimize from Location</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearRoute()">Clear All</button>
+      </div>
+      <div class="chunk-bar" id="chunkBar" style="display:none;">
+        <div class="chunk-bar-title">Tap a chunk to open in Maps</div>
+        <div class="chunk-nav" id="chunkNav"></div>
+        <div class="chunk-info" id="chunkInfo"></div>
+      </div>
+      <div id="routeStats" style="font-size:12px;color:var(--muted);margin-bottom:9px;"></div>
+      <div class="route-list" id="routeList">
+        <div class="empty-state">Add properties from the List tab, then Optimize from Location.</div>
+      </div>
+    </div>
+
+    <!-- KPI TAB -->
+    <div class="tab-content" id="content-kpi">
+      <div class="kpi-grid" id="kpiGrid"><div class="empty-state" style="grid-column:1/-1;">Start canvassing to see KPIs.</div></div>
+      <div id="kpiCharts"></div>
+      <button class="btn btn-ghost btn-sm" onclick="exportCanvassCSV()" style="width:100%;margin-top:8px;">⬇ Export Canvass CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+  <div class="popup">
+    <div class="popup-header">
+      <span class="popup-type-dot" id="popupDot"></span>
+      <div class="popup-title"><h3 id="popupAddress"></h3><div class="popup-type-label" id="popupTypeLabel"></div></div>
+      <button class="popup-close" onclick="closePopupDirect()">✕</button>
+    </div>
+    <div class="popup-body" id="popupBody"></div>
+    <div class="popup-footer" id="popupFooter"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SK={surplus:'prefc_surplus',auction:'prefc_auction',fc:'prefc_fc',apiKey:'prefc_apikey',geocoded:'prefc_geocoded',notes:'prefc_notes',filters:'prefc_filters'};
+const DATA={surplus:[],auction:[],fc:[]};
+const ROUTE=[];
+const FILTERS={fc:true,auction:true,surplus:true,t1only:false};
+const LIST_FILTERS={fc:true,auction:true,surplus:true,t1only:false};
+let googleMap=null,markers=[],drawingManager=null,activeZone=null,drawMode=null;
+let geocodeCache={},geocodeQueue=[],geocoding=false;
+let currentLat=null,currentLng=null,chunks=[],currentChunk=0;
+let NOTES={},outlierIds=new Set();
+
+// Active filter state
+let AF={surplusMin:null,surplusMax:null,dateFrom:null,dateTo:null,street:'',city:'',zip:'',county:'',maxAge:null,tierThreshold:100000};
+
+const STATUSES=['Answered','Not Home','Not Interested','Call Back','Signed'];
+const STATUS_CLASSES=['answered','nothome','notint','callback','signed'];
+const STATUS_COLORS={answered:'var(--green)',nothome:'var(--muted)',notint:'var(--red)',callback:'var(--yellow)',signed:'var(--accent)'};
+
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');setTimeout(()=>el.className='toast',3500);}
+function switchTab(n){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+n).classList.add('active');document.getElementById('content-'+n).classList.add('active');if(n==='kpi')renderKPI();}
+function toggleFilter(t){FILTERS[t]=!FILTERS[t];document.getElementById('chip-'+t).classList.toggle('off',!FILTERS[t]);refreshMarkers();}
+function toggleT1Filter(){FILTERS.t1only=!FILTERS.t1only;document.getElementById('chip-t1').classList.toggle('off',!FILTERS.t1only);refreshMarkers();}
+function toggleListFilter(t){LIST_FILTERS[t]=!LIST_FILTERS[t];document.getElementById('lchip-'+t).classList.toggle('off',!LIST_FILTERS[t]);renderList();}
+function toggleListT1(){LIST_FILTERS.t1only=!LIST_FILTERS.t1only;document.getElementById('lchip-t1').classList.toggle('off',!LIST_FILTERS.t1only);renderList();}
+
+// ── Filters
+function applyFilters(){
+  AF.surplusMin=parseFloat(document.getElementById('fSurplusMin').value)||null;
+  AF.surplusMax=parseFloat(document.getElementById('fSurplusMax').value)||null;
+  AF.dateFrom=document.getElementById('fDateFrom').value||null;
+  AF.dateTo=document.getElementById('fDateTo').value||null;
+  AF.street=document.getElementById('fStreet').value.toLowerCase().trim();
+  AF.city=document.getElementById('fCity').value.toLowerCase().trim();
+  AF.zip=document.getElementById('fZip').value.trim();
+  AF.county=document.getElementById('fCounty').value;
+  AF.maxAge=parseInt(document.getElementById('fMaxAge').value)||null;
+  AF.tierThreshold=parseFloat(document.getElementById('tierThreshold').value)||100000;
+  // Re-classify tier1
+  DATA.surplus.forEach(p=>p._tier1=surplusVal(p)>=AF.tierThreshold);
+  updateFilterSummary();
+  renderList();refreshMarkers();updateHeaderStats();
+  try{localStorage.setItem(SK.filters,JSON.stringify(AF));}catch(e){}
+}
+
+function clearAllFilters(){
+  ['fSurplusMin','fSurplusMax','fStreet','fCity','fZip','fMaxAge'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fDateFrom').value='';document.getElementById('fDateTo').value='';
+  document.getElementById('fCounty').value='';document.getElementById('tierThreshold').value='100000';
+  AF={surplusMin:null,surplusMax:null,dateFrom:null,dateTo:null,street:'',city:'',zip:'',county:'',maxAge:null,tierThreshold:100000};
+  DATA.surplus.forEach(p=>p._tier1=surplusVal(p)>=100000);
+  updateFilterSummary();renderList();refreshMarkers();updateHeaderStats();
+}
+
+function setDatePreset(days){
+  const from=new Date();const to=new Date();to.setDate(to.getDate()+days);
+  document.getElementById('fDateFrom').value=from.toISOString().slice(0,10);
+  document.getElementById('fDateTo').value=to.toISOString().slice(0,10);
+  applyFilters();
+}
+function clearDates(){document.getElementById('fDateFrom').value='';document.getElementById('fDateTo').value='';applyFilters();}
+
+function updateFilterSummary(){
+  const parts=[];
+  if(AF.surplusMin)parts.push('Surplus ≥ $'+AF.surplusMin.toLocaleString());
+  if(AF.surplusMax)parts.push('Surplus ≤ $'+AF.surplusMax.toLocaleString());
+  if(AF.dateFrom)parts.push('Date from '+AF.dateFrom);
+  if(AF.dateTo)parts.push('Date to '+AF.dateTo);
+  if(AF.street)parts.push('Street: '+AF.street);
+  if(AF.city)parts.push('City: '+AF.city);
+  if(AF.zip)parts.push('ZIP: '+AF.zip);
+  if(AF.county)parts.push('County: '+AF.county);
+  if(AF.maxAge)parts.push('Age ≤ '+AF.maxAge+' days');
+  document.getElementById('filterSummary').textContent=parts.length?'Active: '+parts.join(' • '):'No active filters — showing all properties.';
+}
+
+function surplusVal(p){return parseFloat((p.surplusAmount||'').replace(/[$,]/g,''))||0;}
+
+function passesFilter(p){
+  if(p._duplicate||p._hidden)return false;
+  if(p._type==='surplus'){
+    const sv=surplusVal(p);
+    if(AF.surplusMin!==null&&sv<AF.surplusMin)return false;
+    if(AF.surplusMax!==null&&sv>AF.surplusMax)return false;
+    if(AF.maxAge&&p.dateSold){
+      const d=parseDateMMDDYYYY(p.dateSold);
+      if(d){const age=Math.floor((Date.now()-d)/(864e5));if(age>AF.maxAge)return false;}
+    }
+    if(AF.dateFrom&&p.dateSold){const d=parseDateMMDDYYYY(p.dateSold);if(d&&d<new Date(AF.dateFrom))return false;}
+    if(AF.dateTo&&p.dateSold){const d=parseDateMMDDYYYY(p.dateSold);if(d&&d>new Date(AF.dateTo))return false;}
+  }
+  if(p._type==='auction'){
+    if((AF.dateFrom||AF.dateTo)&&p.saleDate){
+      const d=parseDateMMDDYYYY(p.saleDate);
+      if(d){
+        if(AF.dateFrom&&d<new Date(AF.dateFrom))return false;
+        if(AF.dateTo&&d>new Date(AF.dateTo))return false;
+      }
+    }
+  }
+  if(AF.street&&!p.address.toLowerCase().includes(AF.street))return false;
+  if(AF.city&&!p.city.toLowerCase().includes(AF.city))return false;
+  if(AF.zip){const zips=AF.zip.split(',').map(z=>z.trim()).filter(Boolean);if(zips.length&&!zips.includes(p.zip))return false;}
+  if(AF.county&&p.county&&!p.county.toLowerCase().includes(AF.county.toLowerCase()))return false;
+  return true;
+}
+
+function parseDateMMDDYYYY(s){
+  if(!s)return null;
+  const p=s.split('/');if(p.length<3)return null;
+  return new Date(parseInt(p[2]),parseInt(p[0])-1,parseInt(p[1]));
+}
+
+// ── CSV
+function parseCSV(text){const lines=text.split(/\r?\n/);if(!lines.length)return[];const headers=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());const rows=[];for(let i=1;i<lines.length;i++){if(!lines[i].trim())continue;const vals=splitCSV(lines[i]);const obj={};headers.forEach((h,idx)=>{obj[h]=(vals[idx]||'').replace(/^"|"$/g,'').trim();});rows.push(obj);}return rows;}
+function splitCSV(line){const r=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){if(line[i]==='"'){inQ=!inQ;continue;}if(line[i]===','&&!inQ){r.push(cur);cur='';continue;}cur+=line[i];}r.push(cur);return r;}
+
+function loadCSV(event,type){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const rows=parseCSV(e.target.result);
+    DATA[type]=normalizeRows(rows,type);
+    try{localStorage.setItem(SK[type],e.target.result);}catch(ex){}
+    document.getElementById(type+'-label').textContent='✓ '+file.name+' ('+DATA[type].length+')';
+    document.getElementById(type+'-label').className='upload-name';
+    deduplicateAcrossLists();
+    if(type==='auction')checkExpired();
+    updateHeaderStats();renderList();
+    if(googleMap)plotNewMarkers(type);
+    toast('Loaded '+DATA[type].length+' '+type+' records','success');
+  };reader.readAsText(file);
+}
+
+function restoreSavedData(){
+  ['surplus','auction','fc'].forEach(type=>{
+    const raw=localStorage.getItem(SK[type]);if(!raw)return;
+    try{DATA[type]=normalizeRows(parseCSV(raw),type);document.getElementById(type+'-label').textContent='✓ Saved ('+DATA[type].length+')';document.getElementById(type+'-label').className='upload-name';}catch(ex){}
+  });
+  try{const gc=localStorage.getItem(SK.geocoded);if(gc)geocodeCache=JSON.parse(gc);}catch(e){}
+  try{const n=localStorage.getItem(SK.notes);if(n)NOTES=JSON.parse(n);}catch(e){}
+  try{const f=localStorage.getItem(SK.filters);if(f){const saved=JSON.parse(f);Object.assign(AF,saved);restoreFilterUI();}}catch(e){}
+  deduplicateAcrossLists();updateHeaderStats();renderList();
+}
+
+function restoreFilterUI(){
+  if(AF.surplusMin)document.getElementById('fSurplusMin').value=AF.surplusMin;
+  if(AF.surplusMax)document.getElementById('fSurplusMax').value=AF.surplusMax;
+  if(AF.dateFrom)document.getElementById('fDateFrom').value=AF.dateFrom;
+  if(AF.dateTo)document.getElementById('fDateTo').value=AF.dateTo;
+  if(AF.street)document.getElementById('fStreet').value=AF.street;
+  if(AF.city)document.getElementById('fCity').value=AF.city;
+  if(AF.zip)document.getElementById('fZip').value=AF.zip;
+  if(AF.county)document.getElementById('fCounty').value=AF.county;
+  if(AF.maxAge)document.getElementById('fMaxAge').value=AF.maxAge;
+  if(AF.tierThreshold)document.getElementById('tierThreshold').value=AF.tierThreshold;
+  updateFilterSummary();
+}
+
+function saveNotes(){try{localStorage.setItem(SK.notes,JSON.stringify(NOTES));}catch(e){}}
+
+function clearAllData(){
+  if(!confirm('Clear all saved CSV data? Field notes will be preserved.'))return;
+  ['surplus','auction','fc'].forEach(type=>{DATA[type]=[];localStorage.removeItem(SK[type]);document.getElementById(type+'-label').textContent='Tap to upload';document.getElementById(type+'-label').className='upload-text';});
+  localStorage.removeItem(SK.geocoded);geocodeCache={};ROUTE.length=0;chunks=[];
+  markers.forEach(m=>m.setMap(null));markers=[];
+  updateHeaderStats();renderList();updateRouteUI();toast('CSV data cleared. Notes preserved.');
+}
+
+function titleCase(s){return(s||'').replace(/\w\S*/g,t=>t.charAt(0).toUpperCase()+t.substr(1).toLowerCase());}
+
+function normalizeRows(rows,type){
+  return rows.map((r,idx)=>{
+    const base={_type:type,_id:type+'_'+idx,_inRoute:false,_lat:null,_lng:null,_duplicate:false,_hidden:false,_expired:false,_outlier:false,_tier1:false};
+    if(type==='surplus'){
+      // Property address — used for geocoding (map pin location)
+      const propStreet=titleCase((r['Property Street']||'').toLowerCase());
+      const propCity=titleCase((r['Property City']||'').toLowerCase());
+      const propZip=(r['Property ZIP Code']||'').trim();
+      const propState=(r['Property State']||'FL').trim().toUpperCase();
+      // Mailing address — where the owner lives (knock here)
+      const mailStreet=titleCase((r['Mailing Street']||'').toLowerCase());
+      const mailCity=titleCase((r['Mailing City']||'').toLowerCase());
+      const mailZip=(r['Mailing ZIP Code']||'').trim();
+      const mailState=(r['Mailing State']||'FL').trim().toUpperCase();
+      // Use property as the map pin address; fall back to mailing if property missing
+      base.address=propStreet||mailStreet;
+      base.city=propCity||mailCity;
+      base.zip=propZip||mailZip;
+      base.state=propState;
+      base.county=r['County']||'';
+      // Mailing address fields (for door knock navigation)
+      base.mailStreet=mailStreet;
+      base.mailCity=mailCity;
+      base.mailZip=mailZip;
+      base.mailState=mailState;
+      // Detect if addresses differ
+      const propKey=(propStreet+propZip).replace(/\s/g,'').toLowerCase();
+      const mailKey=(mailStreet+mailZip).replace(/\s/g,'').toLowerCase();
+      base._addressesDiffer=!!(propStreet&&mailStreet&&propKey!==mailKey);
+      // Out-of-state owner detection
+      const localStates=['FL'];
+      base._outOfState=!!(mailState&&!localStates.includes(mailState));
+      // Full addresses for navigation
+      base._propFullAddress=propStreet+', '+propCity+', '+propState+' '+propZip;
+      base._mailFullAddress=mailStreet+', '+mailCity+', '+mailState+' '+mailZip;
+      base.ownerName=((r['First Name']||'')+' '+(r['Last Name']||'')).trim();
+      base.caseNumber=r['Case Number']||'';base.parcel=r['Parcel Number']||'';
+      base.dateSold=r['Date Sold']||'';base.openingBid=r['Opening Bid']||'';
+      base.closingBid=r['Closing Bid']||'';base.surplusAmount=r['Surplus Amount']||'';
+      base.fcType=r['Type of foreclosure']||'';base.source=r['Source']||'';
+      base.age=r['Age']||'';base.deceased=r['Deceased']||'';
+      base.phones=[1,2,3,4,5].map(n=>({num:r['Phone '+n]||'',type:r['Phone '+n+': Type']||'',dnc:r['Phone '+n+': DNC/Litigator']||''})).filter(p=>p.num&&p.num!=='nan');
+      base.emails=[1,2,3,4,5].map(n=>r['Email '+n]||'').filter(e=>e&&e!=='nan');
+      // Relatives
+      base.relatives=[1,2,3,4,5].map(n=>{
+        const fn=r[`RELATIVE ${n}: First Name`]||'';
+        const ln=r[`RELATIVE ${n}: Last Name`]||'';
+        if(!fn&&!ln)return null;
+        return{
+          name:(fn+' '+ln).trim(),
+          relation:r[`RELATIVE ${n}: Possible Type`]||'Relative',
+          age:r[`RELATIVE ${n}: Age`]||'',
+          phones:[1,2,3,4,5].map(p=>({num:r[`RELATIVE ${n}: Phone ${p}`]||'',type:r[`RELATIVE ${n}: Phone ${p}: Type`]||'',dnc:r[`RELATIVE ${n}: Phone ${p}: DNC/Litigator`]||''})).filter(p=>p.num&&p.num!=='nan'),
+          emails:[1,2,3,4,5].map(p=>r[`RELATIVE ${n}: Email ${p}`]||'').filter(e=>e&&e!=='nan')
+        };
+      }).filter(Boolean);
+      base._tier1=surplusVal(base)>=AF.tierThreshold;
+    }else if(type==='auction'){
+      base.address=r['Address']||'';base.city=r['City']||'';base.zip=(r['Zip']||'').trim();base.county=r['County']||'';
+      base.ownerName=r['Certificate Holder Name']||r['Plaintiff']||'';
+      base.caseNumber=r['Case Number']||'';base.parcel=r['Parcel ID']||'';
+      base.saleDate=r['Sale Date']||'';
+      base.finalJudgment=r['Final Judgment']?'$'+parseFloat(r['Final Judgment']).toLocaleString():'';
+      base.assessedValue=r['Assessed Value']&&r['Assessed Value']!=='0'?'$'+parseFloat(r['Assessed Value']).toLocaleString():'';
+      base.status=r['Status']||'';base.plaintiffBid=r['Plaintiff Max Bid']||'';
+      base.fcType=r['Type of foreclosure']||'';base.phones=[];base.emails=[];
+    }else{
+      base.address=r['Address']||r['Property Address']||r['Street']||'';
+      base.city=r['City']||'';base.zip=(r['Zip']||r['ZIP']||r['Zip Code']||'').trim();base.county=r['County']||'';
+      base.ownerName=r['Owner Name']||r['Owner']||r['Defendant']||r['Name']||'';
+      base.defaultAmount=r['Default Amount']||r['Amount']||r['Judgment']||'';
+      base.caseNumber=r['Case Number']||'';base.phones=[];base.emails=[];
+    }
+    // _fullAddress used for geocoding — always use property address with correct state
+    const addrState=base.state||'FL';
+    base._fullAddress=base.address+', '+base.city+', '+addrState+' '+base.zip;
+    if(!base._propFullAddress)base._propFullAddress=base._fullAddress;
+    if(!base._mailFullAddress)base._mailFullAddress=base._fullAddress;
+    if(geocodeCache[base._id]){base._lat=geocodeCache[base._id].lat;base._lng=geocodeCache[base._id].lng;}
+    return base;
+  }).filter(r=>r.address);
+}
+
+function deduplicateAcrossLists(){
+  const seen=new Map();let dups=0;
+  ['surplus','auction','fc'].forEach(type=>{
+    DATA[type].forEach(p=>{
+      if(!p.caseNumber)return;
+      if(seen.has(p.caseNumber)){
+        const o=seen.get(p.caseNumber);
+        if(!o.surplusAmount&&p.surplusAmount)o.surplusAmount=p.surplusAmount;
+        if(!o.saleDate&&p.saleDate)o.saleDate=p.saleDate;
+        if(!(o.ownerName||'').trim()&&(p.ownerName||'').trim())o.ownerName=p.ownerName;
+        if(!o.phones.length&&p.phones.length)o.phones=p.phones;
+        if(!o.emails.length&&p.emails.length)o.emails=p.emails;
+        p._duplicate=true;dups++;
+      }else{seen.set(p.caseNumber,p);}
+    });
+  });
+  if(dups>0){document.getElementById('dupCount').textContent=dups+' duplicate case number'+(dups>1?'s':'')+' found';document.getElementById('dupAlert').classList.add('show');}
+}
+
+function checkExpired(){
+  const today=new Date();today.setHours(0,0,0,0);let count=0;
+  DATA.auction.forEach(p=>{
+    const d=parseDateMMDDYYYY(p.saleDate);p._expired=!!(d&&d<today);if(p._expired)count++;
+  });
+  if(count>0){document.getElementById('expiredCount').textContent=count+' auction'+(count>1?'s':'')+' have already occurred';document.getElementById('expiredAlert').classList.add('show');}
+}
+function hideExpired(){DATA.auction.forEach(p=>{if(p._expired)p._hidden=true;});document.getElementById('expiredAlert').classList.remove('show');renderList();refreshMarkers();toast('Past auctions hidden');}
+
+function ageBadge(dateStr){if(!dateStr)return'';const d=parseDateMMDDYYYY(dateStr);if(!d)return'';const days=Math.floor((Date.now()-d)/864e5);if(days<=20)return`<span class="age-badge age-fresh">${days}d</span>`;if(days<=50)return`<span class="age-badge age-mid">${days}d</span>`;return`<span class="age-badge age-old">${days}d</span>`;}
+
+function updateHeaderStats(){
+  const t1=DATA.surplus.filter(p=>!p._duplicate&&!p._hidden&&p._tier1).length;
+  document.getElementById('hdr-t1').textContent=t1+' Anchors';
+  document.getElementById('hdr-fc').textContent=DATA.fc.filter(p=>!p._duplicate&&!p._hidden).length+' FC';
+  document.getElementById('hdr-auction').textContent=DATA.auction.filter(p=>!p._duplicate&&!p._hidden).length+' Auctions';
+  document.getElementById('hdr-surplus').textContent=DATA.surplus.filter(p=>!p._duplicate&&!p._hidden).length+' Surplus';
+}
+
+// ── List rendering
+function getAllVisible(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const all=[];
+  ['fc','auction','surplus'].forEach(type=>{
+    if(!LIST_FILTERS[type])return;
+    DATA[type].forEach(p=>{
+      if(!passesFilter(p))return;
+      if(LIST_FILTERS.t1only&&!p._tier1)return;
+      if(q&&!(p.address.toLowerCase().includes(q)||(p.ownerName||'').toLowerCase().includes(q)))return;
+      all.push(p);
+    });
+  });
+  // Sort: tier1 first, then by surplus amount desc, then by type
+  all.sort((a,b)=>{
+    if(a._tier1&&!b._tier1)return-1;
+    if(!a._tier1&&b._tier1)return 1;
+    return surplusVal(b)-surplusVal(a);
+  });
+  return all;
+}
+
+function renderList(){
+  const list=document.getElementById('propertyList');
+  const items=getAllVisible();
+  document.getElementById('resultsSummary').textContent=items.length+' propert'+(items.length!==1?'ies':'y')+' shown';
+  if(!items.length){list.innerHTML='<div class="empty-state">No properties match your filters.<br>Adjust filters on the Filters tab.</div>';return;}
+  const colors={fc:'red',auction:'yellow',surplus:'green'};
+  list.innerHTML=items.map(p=>{
+    const c=p._tier1?'gold':colors[p._type];
+    const inRoute=ROUTE.find(r=>r._id===p._id);
+    const n=NOTES[p._id]||{};
+    const tier1Tag=p._tier1?`<span class="pc-tag" style="background:var(--gold-bg);color:var(--gold);">★ Anchor</span>`:'';
+    const outlierTag=p._outlier?`<span class="pc-tag" style="background:var(--orange-bg);color:var(--orange);">⚠ Outlier</span>`:'';
+    const ageTag=p._type==='surplus'&&p.dateSold?ageBadge(p.dateSold):'';
+    const oosTag=p._outOfState?`<span class="pc-tag" style="background:rgba(88,166,255,0.1);color:var(--accent);">✈ ${p.mailState} Owner</span>`:'';
+    const diffAddrTag=(p._addressesDiffer&&!p._outOfState)?`<span class="pc-tag" style="background:var(--surface3);color:var(--muted);">2 Addresses</span>`:'';
+    const deceasedTag=p.deceased==='Y'?`<span class="pc-tag" style="background:var(--red-bg);color:var(--red);">Deceased</span>`:'';
+    const knockCity=p._addressesDiffer?p.mailCity:p.city;
+    return`<div class="property-card ${p._tier1?'tier1':''} ${inRoute?'in-route':''} ${p._outlier?'outlier':''}">
+      <div class="pc-header"><span class="pc-dot dot-${c}"></span><span class="pc-address">${p.address}${ageTag}</span></div>
+      <div class="pc-name">${p.ownerName||'Owner unknown'} &bull; ${knockCity||p.city}, FL ${p.zip}</div>
+      <div class="pc-meta">
+        ${p._type==='surplus'?`<span class="pc-tag" style="background:${p._tier1?'var(--gold-bg)':'var(--green-bg)'};color:${p._tier1?'var(--gold)':'var(--green)'};">${p.surplusAmount}</span>`:''}
+        ${p._type==='auction'?`<span class="pc-tag" style="background:var(--yellow-bg);color:var(--yellow);">${p.saleDate}</span>`:''}
+        ${p._type==='fc'?`<span class="pc-tag" style="background:var(--red-bg);color:var(--red);">${p.defaultAmount||'Lis Pendens'}</span>`:''}
+        ${tier1Tag}${outlierTag}${oosTag}${diffAddrTag}${deceasedTag}
+        <span class="pc-tag" style="background:var(--surface3);color:var(--muted);">${p.county}</span>
+      </div>
+      <div class="pc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showPopup('${p._id}')">Details</button>
+        ${inRoute?`<button class="btn btn-danger btn-sm" onclick="removeFromRoute('${p._id}')">Remove</button>`:`<button class="btn ${p._tier1?'btn-gold':'btn'} btn-sm" onclick="addToRoute('${p._id}')">${p._tier1?'★ Add Anchor':'+ Route'}</button>`}
+      </div>
+      <div class="status-bar">
+        ${STATUSES.map((s,i)=>`<button class="status-btn status-${STATUS_CLASSES[i]} ${n.status===s?'active-status':''}" onclick="setStatus('${p._id}','${s}',${i})">${s}</button>`).join('')}
+      </div>
+      ${n.note?`<div class="note-display">📝 ${n.note}</div>`:''}
+      <div class="note-row" id="noterow-${p._id}">
+        <textarea class="note-input" rows="2" placeholder="Field notes..." onblur="saveNote('${p._id}',this.value)">${n.note||''}</textarea>
+      </div>
+      <div style="margin-left:16px;margin-top:3px;">
+        <button class="btn-ghost btn btn-xs" onclick="toggleNote('${p._id}')">📝 Notes</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setStatus(id,status,idx){
+  if(!NOTES[id])NOTES[id]={};
+  NOTES[id].status=NOTES[id].status===status?null:status;
+  saveNotes();
+  const m=markers.find(mk=>mk._data&&mk._data._id===id);
+  if(m){const c=markerColor(m._data);m.setIcon({path:google.maps.SymbolPath.CIRCLE,scale:m._data._tier1?12:9,fillColor:c,fillOpacity:0.95,strokeColor:'#fff',strokeWeight:m._data._tier1?2.5:1.5});}
+  renderList();
+}
+function toggleNote(id){const row=document.getElementById('noterow-'+id);if(row)row.style.display=row.style.display==='none'||!row.style.display?'block':'none';}
+function saveNote(id,val){if(!NOTES[id])NOTES[id]={};NOTES[id].note=val.trim();saveNotes();renderList();}
+
+// ── Zone outlier detection
+function detectOutliers(){
+  if(!activeZone)return;
+  const inZone=markers.filter(m=>m.getVisible()&&m._data);
+  if(!inZone.length)return;
+  const zipCount={};inZone.forEach(m=>{const z=m._data.zip;zipCount[z]=(zipCount[z]||0)+1;});
+  const majorityPrefix=Object.entries(zipCount).sort((a,b)=>b[1]-a[1])[0][0].slice(0,3);
+  outlierIds.clear();
+  inZone.forEach(m=>{
+    const p=m._data;const isOutlier=p.zip&&p.zip.slice(0,3)!==majorityPrefix;
+    p._outlier=isOutlier;if(isOutlier){outlierIds.add(p._id);m.setIcon({path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:'#e07b39',fillOpacity:1,strokeColor:'#fff',strokeWeight:2});}
+  });
+  if(outlierIds.size>0){document.getElementById('outlierCount').textContent=outlierIds.size+' propert'+(outlierIds.size>1?'ies':'y');document.getElementById('outlierAlert').classList.add('show');switchTab('list');renderList();toast(outlierIds.size+' zone outlier(s) flagged','warn');}
+}
+function removeOutliers(){outlierIds.forEach(id=>{const idx=ROUTE.findIndex(r=>r._id===id);if(idx>-1){ROUTE[idx]._inRoute=false;ROUTE.splice(idx,1);}});document.getElementById('outlierAlert').classList.remove('show');updateRouteUI();renderList();toast('Outliers removed from route');}
+
+// ── Popup
+function findById(id){for(const t of['surplus','auction','fc']){const f=DATA[t].find(p=>p._id===id);if(f)return f;}return null;}
+
+function showPopup(id){
+  const p=findById(id);if(!p)return;
+  const dotColor=p._tier1?'var(--gold)':p._outlier?'var(--orange)':{fc:'var(--red)',auction:'var(--yellow)',surplus:'var(--green)'}[p._type];
+  const label={fc:'Foreclosure / Lis Pendens',auction:'Upcoming Auction',surplus:'Surplus Funds'}[p._type];
+  document.getElementById('popupDot').style.background=dotColor;
+  document.getElementById('popupAddress').textContent=p.address+(p._tier1?' ★':'')+(p._outlier?' ⚠':'');
+  document.getElementById('popupTypeLabel').textContent=label+(p._tier1?' — TIER 1 ANCHOR':'')+(p._outlier?' — ZONE OUTLIER':'')+' • '+p.city+', FL '+p.zip;
+  const n=NOTES[id]||{};
+  let body='<div class="detail-grid">';
+  body+=di('Owner',p.ownerName||'Unknown');body+=di('County',p.county);
+  body+=di('Case #',p.caseNumber);body+=di('Parcel',p.parcel||'—');
+  if(p._type==='surplus'){
+    body+=di('Date Sold',p.dateSold+(p.dateSold?' '+ageBadge(p.dateSold):''));body+=di('FC Type',p.fcType);
+    body+=di('Opening Bid',p.openingBid);body+=di('Closing Bid',p.closingBid);
+    body+=di('Surplus Amount',p.surplusAmount,p._tier1?'gold':'green');
+    if(p.source)body+=`<div class="detail-item detail-full"><label>Source</label><a href="${p.source}" target="_blank" style="color:var(--accent);font-size:12px;">View Record ↗</a></div>`;
+  }else if(p._type==='auction'){
+    body+=di('Sale Date',p.saleDate+(p._expired?' (Past)':''),'yellow');body+=di('Status',p.status);
+    body+=di('Final Judgment',p.finalJudgment,'red');body+=di('Assessed Value',p.assessedValue);
+    body+=di('Plaintiff Bid',p.plaintiffBid);body+=di('FC Type',p.fcType);
+  }else{body+=di('Default Amount',p.defaultAmount,'red');}
+  body+='</div>';
+  // Address section for surplus — show dual address logic
+  if(p._type==='surplus'){
+    body+='<div class="detail-item detail-full" style="grid-column:1/-1;margin-top:4px;">';
+    if(p._outOfState){
+      body+=`<div style="background:var(--orange-bg);border:1px solid rgba(224,123,57,0.3);border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:var(--orange);">
+        ⚠ <strong>Out-of-State Owner</strong> — mailing to ${p.mailCity}, ${p.mailState}. Phone/email outreach recommended over door knock.
+      </div>`;
+    }
+    if(p._addressesDiffer){
+      body+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="background:var(--surface3);border-radius:6px;padding:8px 10px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:3px;">🚪 Knock Here (Owner)</div>
+          <div style="font-size:12px;font-weight:600;">${p.mailStreet}</div>
+          <div style="font-size:11px;color:var(--muted);">${p.mailCity}, ${p.mailState} ${p.mailZip}</div>
+        </div>
+        <div style="background:var(--surface3);border-radius:6px;padding:8px 10px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">🏠 Property</div>
+          <div style="font-size:12px;font-weight:600;">${p.address}</div>
+          <div style="font-size:11px;color:var(--muted);">${p.city}, ${p.state||'FL'} ${p.zip}</div>
+        </div>
+      </div>`;
+    }
+    body+='</div>';
+  }
+
+  if(p.phones&&p.phones.length){
+    body+='<div class="contact-section"><h4>Phone Numbers</h4><div class="phone-list">';
+    p.phones.forEach(ph=>{if(!ph.num)return;const num=String(ph.num).replace(/\.0$/,'').replace(/[^\d]/g,'');const disp=num.length===10?`(${num.slice(0,3)}) ${num.slice(3,6)}-${num.slice(6)}`:ph.num;body+=`<div class="phone-row"><a href="tel:${num}">${disp}</a>${ph.type?`<span class="phone-badge">${ph.type}</span>`:''} ${ph.dnc==='Y'?'<span class="dnc-badge">DNC</span>':''}</div>`;});
+    body+='</div>';
+    if(p.emails&&p.emails.length)body+='<div class="email-list">'+p.emails.map(e=>`<a href="mailto:${e}">${e}</a>`).join('')+'</div>';
+    body+='</div>';
+  }
+
+  // Relatives section
+  if(p.relatives&&p.relatives.length){
+    body+=`<div class="contact-section">
+      <h4 style="cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        Relatives (${p.relatives.length}) — tap to expand
+      </h4>
+      <div style="display:none;">`;
+    p.relatives.forEach(rel=>{
+      body+=`<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;margin-bottom:3px;">${rel.name} <span style="font-size:10px;color:var(--muted);font-weight:400;">${rel.relation}${rel.age?' • Age '+rel.age:''}</span></div>`;
+      rel.phones.forEach(ph=>{if(!ph.num)return;const num=String(ph.num).replace(/\.0$/,'').replace(/[^\d]/g,'');const disp=num.length===10?`(${num.slice(0,3)}) ${num.slice(3,6)}-${num.slice(6)}`:ph.num;body+=`<div class="phone-row" style="margin-bottom:2px;"><a href="tel:${num}">${disp}</a>${ph.type?`<span class="phone-badge">${ph.type}</span>`:''} ${ph.dnc==='Y'?'<span class="dnc-badge">DNC</span>':''}</div>`;});
+      rel.emails.forEach(e=>{body+=`<a href="mailto:${e}" style="font-size:11px;color:var(--accent);display:block;">${e}</a>`;});
+      body+='</div>';
+    });
+    body+='</div></div>';
+  }
+
+  body+=`<div class="field-notes-section"><h4>Field Activity</h4><div class="field-status-row">${STATUSES.map((s,i)=>`<button class="fstatus-btn fstatus-${STATUS_CLASSES[i]} ${n.status===s?'selected':''}" onclick="setStatus('${id}','${s}',${i})">${s}</button>`).join('')}</div><textarea class="field-notes-input" id="popupNote" placeholder="Notes — what was said, best time to call, owner details...">${n.note||''}</textarea></div>`;
+  document.getElementById('popupBody').innerHTML=body;
+  const inRoute=ROUTE.find(r=>r._id===p._id);
+  // Navigation buttons — knock address vs property address
+  const knockAddr=p._mailFullAddress||p._fullAddress||p._propFullAddress;
+  const propAddr=p._propFullAddress||p._fullAddress;
+  let navBtns=`<button class="btn btn-sm" onclick="openNavigation('${knockAddr}')">🚪 Navigate to Owner</button>`;
+  if(p._addressesDiffer&&!p._outOfState){
+    navBtns+=`<button class="btn btn-ghost btn-sm" onclick="openNavigation('${propAddr}')">🏠 Navigate to Property</button>`;
+  }
+  document.getElementById('popupFooter').innerHTML=`
+    ${navBtns}
+    ${inRoute?`<button class="btn btn-ghost btn-sm" onclick="removeFromRoute('${p._id}');closePopupDirect();">Remove from Route</button>`:`<button class="btn ${p._tier1?'btn-gold':'btn-ghost'} btn-sm" onclick="addToRoute('${p._id}');closePopupDirect();">${p._tier1?'★ Add Anchor':'+ Add to Route'}</button>`}
+    <button class="btn btn-ghost btn-sm" onclick="saveNote('${id}',document.getElementById('popupNote').value);toast('Notes saved','success');">Save Notes</button>
+  `;
+  document.getElementById('popupOverlay').classList.add('open');
+}
+
+function di(label,val,colorClass=''){if(!val||val==='nan')val='—';return`<div class="detail-item"><label>${label}</label><span class="val${colorClass?' val-'+colorClass:''}">${val}</span></div>`;}
+function closePopup(e){if(e.target===e.currentTarget)closePopupDirect();}
+function closePopupDirect(){document.getElementById('popupOverlay').classList.remove('open');renderList();}
+
+// ── Route
+function addToRoute(id){
+  const p=findById(id);if(!p)return;
+  if(ROUTE.find(r=>r._id===id)){toast('Already in route');return;}
+  ROUTE.push(p);p._inRoute=true;chunks=[];updateRouteUI();renderList();
+  toast((p._tier1?'★ Anchor':'Stop')+' added to route','success');
+}
+function removeFromRoute(id){const idx=ROUTE.findIndex(r=>r._id===id);if(idx>-1){ROUTE[idx]._inRoute=false;ROUTE.splice(idx,1);}chunks=[];updateRouteUI();renderList();}
+function clearRoute(){ROUTE.forEach(p=>p._inRoute=false);ROUTE.length=0;chunks=[];updateRouteUI();renderList();}
+
+function dist(lat1,lng1,lat2,lng2){const R=3959,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+function optimizeFromLocation(){
+  if(!ROUTE.length){toast('Add stops to your route first');return;}
+  const locEl=document.getElementById('locStatus');
+  locEl.textContent='Getting your location...';locEl.className='loc-status show loc-ok';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat=pos.coords.latitude;currentLng=pos.coords.longitude;
+    // Tier 1 anchors first, fill-ins second — each group nearest-neighbor sorted
+    const t1=ROUTE.filter(p=>p._tier1);
+    const fills=ROUTE.filter(p=>!p._tier1);
+    const sortGroup=(group,startLat,startLng)=>{
+      const rem=[...group];const sorted=[];let cLat=startLat,cLng=startLng;
+      while(rem.length){
+        let best=null,bestD=Infinity,bIdx=0;
+        rem.forEach((p,i)=>{if(p._lat!==null&&p._lng!==null){const d=dist(cLat,cLng,p._lat,p._lng);if(d<bestD){bestD=d;best=p;bIdx=i;}}});
+        if(!best){sorted.push(...rem.sort((a,b)=>a.zip.localeCompare(b.zip)));break;}
+        sorted.push(best);cLat=best._lat;cLng=best._lng;rem.splice(bIdx,1);
+      }
+      return sorted;
+    };
+    const sortedT1=sortGroup(t1,currentLat,currentLng);
+    const lastT1=sortedT1.length?sortedT1[sortedT1.length-1]:null;
+    const sortedFills=sortGroup(fills,lastT1?lastT1._lat||currentLat:currentLat,lastT1?lastT1._lng||currentLng:currentLng);
+    // Interleave: for each anchor, insert nearby fill-ins before next anchor
+    const finalRoute=[];
+    const usedFills=new Set();
+    sortedT1.forEach((anchor,ai)=>{
+      finalRoute.push(anchor);
+      if(!anchor._lat)return;
+      const nextAnchor=sortedT1[ai+1];
+      // Add fill-ins within ~2 miles of this anchor
+      sortedFills.forEach(f=>{
+        if(usedFills.has(f._id))return;
+        if(!f._lat)return;
+        if(dist(anchor._lat,anchor._lng,f._lat,f._lng)<2.5){finalRoute.push(f);usedFills.add(f._id);}
+      });
+    });
+    // Any remaining fills at the end
+    sortedFills.filter(f=>!usedFills.has(f._id)).forEach(f=>finalRoute.push(f));
+    ROUTE.length=0;finalRoute.forEach(p=>ROUTE.push(p));
+    buildChunks();updateRouteUI();
+    if(googleMap){googleMap.setCenter({lat:currentLat,lng:currentLng});googleMap.setZoom(13);new google.maps.Marker({position:{lat:currentLat,lng:currentLng},map:googleMap,title:'You are here',icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:'#58a6ff',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});}
+    detectOutliers();
+    locEl.textContent=`✓ Route optimized — ${t1.length} anchors, ${fills.length} fill-ins`;
+    toast('Route optimized from your location','success');
+  },()=>{
+    locEl.textContent='Location unavailable — sorted by tier then area';locEl.className='loc-status show loc-err';
+    const sorted=[...ROUTE].sort((a,b)=>{if(a._tier1&&!b._tier1)return-1;if(!a._tier1&&b._tier1)return 1;return a.zip.localeCompare(b.zip);});
+    ROUTE.length=0;sorted.forEach(p=>ROUTE.push(p));buildChunks();updateRouteUI();
+  },{enableHighAccuracy:true,timeout:10000});
+}
+
+const CHUNK_SIZE=10;
+function buildChunks(){chunks=[];for(let i=0;i<ROUTE.length;i+=CHUNK_SIZE)chunks.push(ROUTE.slice(i,i+CHUNK_SIZE));currentChunk=0;}
+
+function openChunk(idx){
+  if(!chunks.length){toast('Optimize route first');return;}
+  currentChunk=idx;const stops=chunks[idx];
+  const knockAddr=p=>p._type==='surplus'?(p._mailFullAddress||p._fullAddress):p._fullAddress;
+  const origin=currentLat&&currentLng?`${currentLat},${currentLng}`:encodeURIComponent(knockAddr(stops[0]));
+  const dest=encodeURIComponent(knockAddr(stops[stops.length-1]));
+  const wps=stops.slice(0,-1).map(p=>encodeURIComponent(knockAddr(p))).join('|');
+  let url=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+  if(wps)url+='&waypoints='+wps;window.open(url,'_blank');updateChunkUI();
+}
+
+function updateChunkUI(){
+  const bar=document.getElementById('chunkBar');if(!chunks.length){bar.style.display='none';return;}
+  bar.style.display='block';
+  document.getElementById('chunkNav').innerHTML=chunks.map((ch,i)=>{const s=i*CHUNK_SIZE+1,e=s+ch.length-1;const hasT1=ch.some(p=>p._tier1);return`<button class="chunk-btn ${i===currentChunk?'active-chunk':''}" onclick="openChunk(${i})">${hasT1?'★ ':''}Chunk ${i+1}<br><span style="font-size:10px;font-weight:400;">Stops ${s}–${e}</span></button>`;}).join('');
+  document.getElementById('chunkInfo').textContent=chunks.length+' chunk'+(chunks.length>1?'s':'')+' • '+ROUTE.length+' total stops';
+}
+
+function updateRouteUI(){
+  document.getElementById('routeCount').textContent=ROUTE.length;
+  const list=document.getElementById('routeList');
+  if(!ROUTE.length){list.innerHTML='<div class="empty-state">Add properties from the List tab, then Optimize from Location.</div>';document.getElementById('routeStats').textContent='';document.getElementById('chunkBar').style.display='none';return;}
+  updateChunkUI();
+  const t1count=ROUTE.filter(p=>p._tier1).length;
+  document.getElementById('routeStats').textContent=ROUTE.length+' stops — '+t1count+' anchor'+(t1count!==1?'s':'')+(chunks.length?' • '+chunks.length+' chunks':'');
+  list.innerHTML=ROUTE.map((p,i)=>{
+    const n=NOTES[p._id]||{};
+    const sIdx=n.status?STATUSES.indexOf(n.status):-1;
+    const sdot=sIdx>=0?`<span style="width:6px;height:6px;border-radius:50%;background:${Object.values(STATUS_COLORS)[sIdx]};display:inline-block;margin-right:3px;"></span>`:'';
+    return`<div class="route-item ${p._tier1?'tier1-route':''}">
+      <div class="route-num ${p._tier1?'gold-num':''}">${p._tier1?'★':i+1}</div>
+      <div class="route-info"><div class="route-addr">${p.address}</div><div class="route-sub">${sdot}${n.status||'Not visited'} &bull; ${p.city} ${p.zip} &bull; <span style="color:var(--accent)">Chunk ${Math.floor(i/CHUNK_SIZE)+1}</span></div></div>
+      <button class="btn btn-ghost btn-sm" onclick="removeFromRoute('${p._id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function openNavigation(address){window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&travelmode=driving`,'_blank');}
+
+// ── KPI
+function renderKPI(){
+  const allProps=[...DATA.surplus,...DATA.auction,...DATA.fc].filter(p=>!p._duplicate&&!p._hidden);
+  const contacted=allProps.filter(p=>NOTES[p._id]&&NOTES[p._id].status);
+  const outcomes={Answered:0,'Not Home':0,'Not Interested':0,'Call Back':0,Signed:0};
+  contacted.forEach(p=>{const s=NOTES[p._id].status;if(outcomes[s]!==undefined)outcomes[s]++;});
+  const totalSurplus=DATA.surplus.filter(p=>!p._duplicate).reduce((s,p)=>s+surplusVal(p),0);
+  const t1Surplus=DATA.surplus.filter(p=>!p._duplicate&&p._tier1).reduce((s,p)=>s+surplusVal(p),0);
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi-card"><div class="kpi-val">${contacted.length}</div><div class="kpi-label">Doors Knocked</div><div class="kpi-sub">of ${allProps.length} total</div></div>
+    <div class="kpi-card"><div class="kpi-val">${allProps.length?Math.round(contacted.length/allProps.length*100):0}%</div><div class="kpi-label">Contact Rate</div><div class="kpi-sub">${outcomes.Answered} answered</div></div>
+    <div class="kpi-card"><div class="kpi-val">${outcomes.Signed}</div><div class="kpi-label">Signed</div><div class="kpi-sub">contracts</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--gold);">${DATA.surplus.filter(p=>!p._duplicate&&p._tier1).length}</div><div class="kpi-label">★ Anchors</div><div class="kpi-sub">$${Math.round(t1Surplus/1000)}K total</div></div>
+    <div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-val">$${Math.round(totalSurplus/1000)}K</div><div class="kpi-label">Total Surplus Pool</div><div class="kpi-sub">${DATA.surplus.filter(p=>!p._duplicate).length} surplus properties</div></div>
+  `;
+  const outcomeColors={Answered:'#3fb950','Not Home':'#8b949e','Not Interested':'#f85149','Call Back':'#d29922',Signed:'#58a6ff'};
+  const maxO=Math.max(...Object.values(outcomes),1);
+  let charts=`<div class="section-title" style="margin-bottom:7px;">Outcome Breakdown</div><div class="bar-chart">`;
+  Object.entries(outcomes).forEach(([k,v])=>{charts+=`<div class="bar-row"><div class="bar-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxO*100)}%;background:${outcomeColors[k]};"></div><span class="bar-count">${v}</span></div></div>`;});
+  charts+='</div>';
+  const zipMap={};contacted.forEach(p=>{zipMap[p.zip]=(zipMap[p.zip]||0)+1;});
+  const topZips=Object.entries(zipMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(topZips.length){
+    const mZ=topZips[0][1];charts+=`<div class="section-title" style="margin-bottom:7px;">Top Zips Canvassed</div><div class="bar-chart">`;
+    topZips.forEach(([z,c])=>{charts+=`<div class="bar-row"><div class="bar-label">${z}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/mZ*100)}%;background:var(--accent);"></div><span class="bar-count">${c}</span></div></div>`;});
+    charts+='</div>';
+  }
+  document.getElementById('kpiCharts').innerHTML=charts;
+}
+
+function exportCanvassCSV(){
+  const all=[...DATA.surplus,...DATA.auction,...DATA.fc].filter(p=>!p._duplicate&&NOTES[p._id]&&(NOTES[p._id].status||NOTES[p._id].note));
+  if(!all.length){toast('No canvass data to export','error');return;}
+  const headers=['Address','City','ZIP','County','Owner','Type','Tier','Status','Notes','Case #','Surplus Amount','Sale Date'];
+  const rows=all.map(p=>{const n=NOTES[p._id]||{};return[p.address,p.city,p.zip,p.county,p.ownerName,p._type,p._tier1?'Anchor':'Standard',n.status||'',n.note||'',p.caseNumber,p.surplusAmount||'',p.dateSold||p.saleDate||''];});
+  const csv=[headers,...rows].map(r=>r.map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='canvass_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  toast('Exported '+all.length+' records','success');
+}
+
+// ── Map
+function initMap(){
+  const key=document.getElementById('apiKeyInput').value.trim();
+  if(!key){toast('Enter your API key','error');return;}
+  localStorage.setItem(SK.apiKey,key);
+  const s=document.createElement('script');
+  s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&libraries=drawing,geometry&callback=onMapReady`;
+  s.onerror=()=>toast('Map failed to load','error');document.head.appendChild(s);
+}
+
+function onMapReady(){
+  document.getElementById('mapPlaceholder').style.display='none';
+  document.getElementById('mapControls').style.display='flex';
+  document.getElementById('mapLegend').style.display='block';
+  const mapDiv=document.createElement('div');mapDiv.style.cssText='width:100%;height:100%;';document.getElementById('map').appendChild(mapDiv);
+  googleMap=new google.maps.Map(mapDiv,{center:{lat:26.0,lng:-80.2},zoom:11,styles:darkStyles(),disableDefaultUI:false,zoomControl:true,mapTypeControl:false,streetViewControl:false,fullscreenControl:false});
+  drawingManager=new google.maps.drawing.DrawingManager({drawingControl:false,
+    circleOptions:{fillColor:'#58a6ff',fillOpacity:0.1,strokeColor:'#58a6ff',strokeWeight:2,editable:true},
+    rectangleOptions:{fillColor:'#58a6ff',fillOpacity:0.1,strokeColor:'#58a6ff',strokeWeight:2,editable:true}});
+  drawingManager.setMap(googleMap);
+  google.maps.event.addListener(drawingManager,'overlaycomplete',e=>{
+    if(activeZone)activeZone.setMap(null);activeZone=e.overlay;drawingManager.setDrawingMode(null);
+    document.getElementById('btnDraw').classList.remove('active');document.getElementById('btnDrawRect').classList.remove('active');
+    drawMode=null;filterMarkersToZone();setTimeout(detectOutliers,500);
+  });
+  plotNewMarkers('surplus');plotNewMarkers('auction');plotNewMarkers('fc');
+}
+
+function plotNewMarkers(type){
+  if(!googleMap)return;
+  markers=markers.filter(m=>{if(m._data._type===type){m.setMap(null);return false;}return true;});
+  DATA[type].filter(p=>p.address&&!p._duplicate&&!p._hidden).forEach(p=>{
+    if(geocodeCache[p._id]){p._lat=geocodeCache[p._id].lat;p._lng=geocodeCache[p._id].lng;placeMarker(p,geocodeCache[p._id]);}
+    else{geocodeQueue.push(p);if(!geocoding)processGeocode();}
+  });
+}
+
+// Known ZIP centroid fallbacks for South Florida (lat,lng)
+const ZIP_CENTROIDS={'33004':[26.0587,-80.1456],'33009':[25.9837,-80.1481],'33010':[25.8280,-80.2778],'33012':[25.8558,-80.3094],'33013':[25.8680,-80.2503],'33014':[25.8918,-80.3094],'33015':[25.9185,-80.3208],'33016':[25.8753,-80.3281],'33018':[25.9042,-80.3622],'33019':[26.0162,-80.1192],'33020':[26.0120,-80.1503],'33021':[26.0251,-80.1787],'33023':[25.9906,-80.2114],'33024':[26.0162,-80.2481],'33025':[25.9837,-80.2481],'33026':[26.0162,-80.2812],'33027':[25.9657,-80.3094],'33028':[25.9837,-80.3281],'33029':[25.9657,-80.3622],'33030':[25.5012,-80.4736],'33031':[25.5189,-80.4403],'33032':[25.5367,-80.3806],'33033':[25.4835,-80.4403],'33034':[25.4189,-80.5131],'33035':[25.4657,-80.4736],'33039':[25.4482,-80.4070],'33054':[25.9542,-80.2481],'33055':[25.9418,-80.2812],'33056':[25.9418,-80.3094],'33060':[26.2290,-80.1331],'33062':[26.2290,-80.1006],'33063':[26.2290,-80.2206],'33064':[26.2604,-80.1503],'33065':[26.2759,-80.2481],'33066':[26.2604,-80.2206],'33067':[26.3072,-80.2481],'33068':[26.2759,-80.2812],'33069':[26.2290,-80.1787],'33071':[26.1290,-80.2812],'33073':[26.3225,-80.2206],'33076':[26.3538,-80.2481],'33109':[25.7700,-80.1503],'33125':[25.7784,-80.2278],'33126':[25.7617,-80.2953],'33127':[25.8120,-80.2094],'33128':[25.7753,-80.1981],'33129':[25.7448,-80.1981],'33130':[25.7617,-80.2094],'33131':[25.7617,-80.1870],'33132':[25.7784,-80.1870],'33133':[25.7284,-80.2503],'33134':[25.7448,-80.2728],'33135':[25.7617,-80.2503],'33136':[25.7784,-80.2094],'33137':[25.7951,-80.1870],'33138':[25.8120,-80.1870],'33139':[25.7865,-80.1331],'33140':[25.8032,-80.1331],'33141':[25.8477,-80.1225],'33142':[25.8187,-80.2503],'33143':[25.7118,-80.2953],'33144':[25.7617,-80.3206],'33145':[25.7448,-80.2278],'33146':[25.7118,-80.2728],'33147':[25.8355,-80.2503],'33149':[25.7118,-80.1656],'33150':[25.8477,-80.2094],'33154':[25.8812,-80.1225],'33155':[25.7284,-80.3206],'33156':[25.6784,-80.3094],'33157':[25.6284,-80.3428],'33158':[25.6118,-80.3206],'33160':[25.9418,-80.1331],'33161':[25.9042,-80.1656],'33162':[25.9185,-80.1656],'33163':[25.9418,-80.2481],'33165':[25.7284,-80.3622],'33166':[25.8187,-80.3428],'33167':[25.8645,-80.2278],'33168':[25.8812,-80.2278],'33169':[25.9185,-80.2278],'33170':[25.5867,-80.3806],'33172':[25.7617,-80.3806],'33173':[25.6951,-80.3622],'33174':[25.7617,-80.3806],'33175':[25.7284,-80.4070],'33176':[25.6618,-80.3428],'33177':[25.6118,-80.3806],'33178':[25.8187,-80.3806],'33179':[25.9542,-80.1656],'33180':[25.9657,-80.1331],'33181':[25.8977,-80.1503],'33182':[25.7617,-80.4403],'33183':[25.6951,-80.3806],'33184':[25.7284,-80.3806],'33185':[25.6951,-80.4070],'33186':[25.6618,-80.3806],'33187':[25.6284,-80.4070],'33189':[25.5867,-80.4070],'33193':[25.6618,-80.4403],'33194':[25.7284,-80.4403],'33196':[25.6618,-80.4736],'33301':[26.1212,-80.1375],'33304':[26.1376,-80.1192],'33305':[26.1548,-80.1192],'33306':[26.1712,-80.1192],'33308':[26.2104,-80.1006],'33309':[26.1876,-80.1787],'33310':[26.2104,-80.1787],'33311':[26.1376,-80.1787],'33312':[26.0712,-80.1787],'33313':[26.1212,-80.2206],'33314':[26.0712,-80.2481],'33315':[26.0712,-80.1656],'33316':[26.1048,-80.1375],'33317':[26.1212,-80.2481],'33319':[26.1548,-80.2206],'33321':[26.2104,-80.2481],'33322':[26.1548,-80.2812],'33323':[26.1548,-80.3094],'33324':[26.1212,-80.2812],'33325':[26.1212,-80.3094],'33326':[26.1212,-80.3428],'33327':[26.1548,-80.3622],'33328':[26.0712,-80.2812],'33330':[26.0712,-80.3094],'33331':[26.0712,-80.3428],'33332':[26.0712,-80.3806],'33334':[26.1876,-80.1503],'33351':[26.1712,-80.2481],'33388':[26.1548,-80.2206],'33394':[26.0878,-80.1787]};
+
+function zipCentroid(zip){return ZIP_CENTROIDS[zip]||null;}
+
+function processGeocode(){
+  if(!geocodeQueue.length){geocoding=false;return;}geocoding=true;const p=geocodeQueue.shift();
+  // Build ZIP-anchored query for more accurate results
+  const state=p.state||'FL';
+  const query=`${p.address}, ${p.city}, ${state} ${p.zip}`;
+  new google.maps.Geocoder().geocode({address:query},(results,status)=>{
+    if(status==='OK'){
+      const lat=results[0].geometry.location.lat();
+      const lng=results[0].geometry.location.lng();
+      // Validate: result should be within ~20 miles of ZIP centroid
+      const centroid=zipCentroid(p.zip);
+      let valid=true;
+      if(centroid){
+        const d=dist(lat,lng,centroid[0],centroid[1]);
+        if(d>20){valid=false;p._geoMismatch=true;console.warn(`Geocode mismatch for ${p.address}: placed ${d.toFixed(1)}mi from ZIP ${p.zip} centroid`);}
+      }
+      if(valid){
+        const loc={lat,lng};geocodeCache[p._id]=loc;p._lat=lat;p._lng=lng;placeMarker(p,loc);
+        if(Math.random()<0.1){try{localStorage.setItem(SK.geocoded,JSON.stringify(geocodeCache));}catch(e){}}
+      }else{
+        // Fall back to ZIP centroid
+        if(centroid){const loc={lat:centroid[0],lng:centroid[1]};geocodeCache[p._id]=loc;p._lat=loc.lat;p._lng=loc.lng;placeMarker(p,loc);}
+      }
+    }
+    setTimeout(processGeocode,120);
+  });
+}
+
+function markerColor(p){
+  const n=NOTES[p._id];
+  if(n&&n.status){const sc={answered:'#3fb950',nothome:'#8b949e',notint:'#f85149',callback:'#d29922',signed:'#58a6ff'};return sc[STATUS_CLASSES[STATUSES.indexOf(n.status)]]||'#8b949e';}
+  if(p._outlier)return'#e07b39';
+  if(p._tier1)return'#ffd700';
+  return{fc:'#f85149',auction:'#d29922',surplus:'#3fb950'}[p._type];
+}
+
+function placeMarker(p,latlng){
+  const isTier1=p._tier1;
+  const marker=new google.maps.Marker({position:latlng,map:googleMap,title:p.address,
+    icon:{path:google.maps.SymbolPath.CIRCLE,scale:isTier1?13:9,fillColor:markerColor(p),fillOpacity:0.95,strokeColor:'#fff',strokeWeight:isTier1?2.5:1.5},
+    zIndex:isTier1?10:1});
+  marker._data=p;marker.addListener('click',()=>showPopup(p._id));markers.push(marker);
+  if(!shouldShow(p))marker.setVisible(false);
+}
+
+function shouldShow(p){
+  if(!FILTERS[p._type]||p._duplicate||p._hidden)return false;
+  if(FILTERS.t1only&&!p._tier1)return false;
+  if(!passesFilter(p))return false;
+  return true;
+}
+function refreshMarkers(){markers.forEach(m=>{m.setVisible(shouldShow(m._data));if(m._data._tier1){const c=markerColor(m._data);m.setIcon({path:google.maps.SymbolPath.CIRCLE,scale:13,fillColor:c,fillOpacity:0.95,strokeColor:'#fff',strokeWeight:2.5});}});if(activeZone)filterMarkersToZone();}
+function filterMarkersToZone(){if(!activeZone)return;markers.forEach(m=>{if(!shouldShow(m._data)){m.setVisible(false);return;}const pos=m.getPosition();let inside=false;if(activeZone instanceof google.maps.Circle)inside=google.maps.geometry.spherical.computeDistanceBetween(pos,activeZone.getCenter())<=activeZone.getRadius();else if(activeZone instanceof google.maps.Rectangle)inside=activeZone.getBounds().contains(pos);m.setVisible(inside);});}
+function clearZone(){if(activeZone){activeZone.setMap(null);activeZone=null;}outlierIds.clear();DATA.surplus.concat(DATA.auction,DATA.fc).forEach(p=>p._outlier=false);markers.forEach(m=>{m.setVisible(shouldShow(m._data));m.setIcon({path:google.maps.SymbolPath.CIRCLE,scale:m._data._tier1?13:9,fillColor:markerColor(m._data),fillOpacity:0.95,strokeColor:'#fff',strokeWeight:m._data._tier1?2.5:1.5});});}
+function toggleDrawMode(mode){if(!googleMap){toast('Load the map first');return;}if(drawMode===mode){drawingManager.setDrawingMode(null);document.getElementById('btnDraw').classList.remove('active');document.getElementById('btnDrawRect').classList.remove('active');drawMode=null;}else{drawMode=mode;drawingManager.setDrawingMode(mode==='circle'?google.maps.drawing.OverlayType.CIRCLE:google.maps.drawing.OverlayType.RECTANGLE);document.getElementById('btnDraw').classList.toggle('active',mode==='circle');document.getElementById('btnDrawRect').classList.toggle('active',mode==='rectangle');}}
+function locateMe(){if(!navigator.geolocation){toast('Geolocation not available');return;}navigator.geolocation.getCurrentPosition(pos=>{const ll={lat:pos.coords.latitude,lng:pos.coords.longitude};googleMap.setCenter(ll);googleMap.setZoom(13);new google.maps.Marker({position:ll,map:googleMap,title:'You are here',icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:'#58a6ff',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});},()=>toast('Could not get location','error'));}
+
+function darkStyles(){return[{elementType:'geometry',stylers:[{color:'#1d2130'}]},{elementType:'labels.text.stroke',stylers:[{color:'#1d2130'}]},{elementType:'labels.text.fill',stylers:[{color:'#8b949e'}]},{featureType:'road',elementType:'geometry',stylers:[{color:'#2d333b'}]},{featureType:'road',elementType:'geometry.stroke',stylers:[{color:'#161b22'}]},{featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#8b949e'}]},{featureType:'road.highway',elementType:'geometry',stylers:[{color:'#2d4a6e'}]},{featureType:'water',elementType:'geometry',stylers:[{color:'#0d1117'}]},{featureType:'water',elementType:'labels.text.fill',stylers:[{color:'#30363d'}]},{featureType:'poi',elementType:'geometry',stylers:[{color:'#21262d'}]},{featureType:'poi.park',elementType:'geometry',stylers:[{color:'#1a2b1a'}]},{featureType:'transit',elementType:'geometry',stylers:[{color:'#21262d'}]},{featureType:'administrative',elementType:'geometry.stroke',stylers:[{color:'#30363d'}]}];}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  restoreSavedData();updateFilterSummary();
+  const savedKey=localStorage.getItem(SK.apiKey);
+  if(savedKey){document.getElementById('apiKeyInput').value=savedKey;const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${savedKey}&libraries=drawing,geometry&callback=onMapReady`;document.head.appendChild(s);}
+});
+</script>
+</body>
+</html>
