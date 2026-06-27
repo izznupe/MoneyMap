@@ -182,9 +182,118 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .toast.warn{border-color:rgba(224,123,57,0.4);color:var(--orange);}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 @media(max-width:640px){:root{--panel:100vw;}.main{flex-direction:column;}#map{height:42vh;flex:none;}.sidebar{width:100%;border-left:none;border-top:1px solid var(--border);}header{flex-wrap:wrap;}}
+
+/* MOBILE LAYOUT */
+.mobile-app{display:none;}
+.desktop-app{display:flex;flex-direction:column;height:100vh;}
+@media(max-width:900px){.desktop-app{display:none!important;}.mobile-app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}}
+.m-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:200;}
+.m-logo{font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);flex:1;}
+.m-stat{font-size:11px;font-weight:600;padding:3px 8px;border-radius:12px;}
+.m-map-wrap{flex:1;position:relative;overflow:hidden;}
+.m-fab-group{position:absolute;right:12px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:100;}
+.m-fab{width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.5);transition:all 0.15s;}
+.m-fab:active{transform:scale(0.9);}
+.m-fab.accent{background:var(--accent);color:#000;border-color:var(--accent);}
+.m-legend{position:absolute;top:10px;left:10px;background:rgba(22,27,34,0.9);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;z-index:100;}
+.m-legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);margin-bottom:3px;}
+.m-legend-item:last-child{margin-bottom:0;}
+.m-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);border-radius:16px 16px 0 0;z-index:150;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0,0.67,0);max-height:88vh;display:flex;flex-direction:column;}
+.m-sheet.open{transform:translateY(0);}
+.m-sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 6px;flex-shrink:0;}
+.m-sheet-header{padding:0 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;}
+.m-sheet-title{font-size:15px;font-weight:700;flex:1;}
+.m-sheet-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:2px;line-height:1;}
+.m-sheet-body{overflow-y:auto;padding:14px 16px;flex:1;-webkit-overflow-scrolling:touch;}
+.m-sheet-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;padding-bottom:max(10px,env(safe-area-inset-bottom));}
+.m-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.m-detail-item label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:2px;}
+.m-detail-item .val{font-size:13px;font-weight:600;color:var(--text);}
+.m-detail-full{grid-column:1/-1;}
+.m-phone-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.m-phone-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:var(--radius);padding:12px;}
+.m-phone-info{flex:1;}
+.m-phone-num{font-size:16px;font-weight:700;color:var(--accent);text-decoration:none;display:block;}
+.m-phone-type{font-size:11px;color:var(--muted);margin-top:2px;}
+.m-call-btn{width:44px;height:44px;border-radius:50%;background:var(--green-bg);border:1px solid rgba(63,185,80,0.4);color:var(--green);font-size:20px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;}
+.m-dnc{font-size:10px;padding:2px 6px;border-radius:3px;background:var(--red-bg);color:var(--red);}
+.m-addr-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.m-addr-card{background:var(--surface2);border-radius:var(--radius);padding:10px 12px;}
+.m-addr-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.m-addr-text{font-size:13px;font-weight:600;line-height:1.4;}
+.m-addr-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.m-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.m-status-btn{padding:14px 8px;border-radius:var(--radius);font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;}
+.m-status-btn:active{transform:scale(0.95);}
+.m-status-answered.sel{background:var(--green-bg);color:var(--green);border-color:rgba(63,185,80,0.4);}
+.m-status-nothome.sel{background:var(--surface3);color:var(--text);border-color:var(--muted);}
+.m-status-notint.sel{background:var(--red-bg);color:var(--red);border-color:rgba(248,81,73,0.4);}
+.m-status-callback.sel{background:var(--yellow-bg);color:var(--yellow);border-color:rgba(210,153,34,0.4);}
+.m-status-signed.sel{background:rgba(88,166,255,0.15);color:var(--accent);border-color:rgba(88,166,255,0.4);}
+.m-status-signed{grid-column:1/-1;}
+.m-notes-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:var(--radius);font-size:15px;resize:none;min-height:90px;font-family:inherit;-webkit-appearance:none;}
+.m-notes-input:focus{outline:none;border-color:var(--accent);}
+.m-route-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;}
+.m-route-item.t1r{border-color:rgba(255,215,0,0.4);}
+.m-route-num{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#000;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.m-route-num.gn{background:var(--gold);}
+.m-route-info{flex:1;min-width:0;}
+.m-route-addr{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-route-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.m-nav-bar{background:var(--surface);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:max(6px,env(safe-area-inset-bottom));}
+.m-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;border:none;background:none;gap:3px;-webkit-tap-highlight-color:transparent;}
+.m-nav-icon{font-size:20px;line-height:1;}
+.m-nav-btn.active{color:var(--accent);}
+.m-prop-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;}
+.m-prop-card.t1{border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.04);}
+.m-prop-card.in-route{border-color:var(--green);}
+.m-prop-addr{font-size:13px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.m-prop-owner{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.m-prop-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.m-tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600;}
+.m-prop-actions{display:flex;gap:8px;}
+.m-prop-btn{flex:1;padding:10px;border-radius:var(--radius);font-size:13px;font-weight:600;text-align:center;cursor:pointer;border:1px solid var(--border);}
+.m-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:140;}
+.m-backdrop.show{display:block;}
+.m-filter-section{margin-bottom:14px;}
+.m-filter-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
+.m-filter-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:var(--radius);font-size:15px;-webkit-appearance:none;font-family:inherit;}
+.m-filter-input:focus{outline:none;border-color:var(--accent);}
+.m-filter-row{display:flex;gap:8px;margin-bottom:8px;}
+.m-filter-row .m-filter-input{flex:1;}
+.m-chip-row{display:flex;gap:6px;flex-wrap:wrap;}
+.m-chip{padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent;}
+.m-chip-red{background:var(--red-bg);color:var(--red);border-color:rgba(248,81,73,0.3);}
+.m-chip-yellow{background:var(--yellow-bg);color:var(--yellow);border-color:rgba(210,153,34,0.3);}
+.m-chip-green{background:var(--green-bg);color:var(--green);border-color:rgba(63,185,80,0.3);}
+.m-chip-gold{background:var(--gold-bg);color:var(--gold);border-color:rgba(255,215,0,0.3);}
+.m-chip.off{opacity:0.35;}
+.m-date-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.m-date-preset{padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;}
+.m-divider{height:1px;background:var(--border);margin:14px 0;}
+.m-upload-card{background:var(--surface2);border:2px dashed var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;position:relative;text-align:center;cursor:pointer;}
+.m-upload-card input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;}
+.m-upload-icon{font-size:28px;margin-bottom:6px;}
+.m-upload-text{font-size:13px;color:var(--muted);pointer-events:none;}
+.m-upload-done{font-size:13px;color:var(--green);font-weight:600;pointer-events:none;}
+.m-oos-warn{background:var(--orange-bg);border:1px solid rgba(224,123,57,0.3);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--orange);margin-bottom:12px;}
+.m-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px;margin-top:16px;}
+.m-empty{text-align:center;padding:36px 16px;color:var(--muted);font-size:14px;line-height:1.7;}
+.m-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none;}
+.m-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.m-toast.success{color:var(--green);border-color:rgba(63,185,80,0.4);}
+.m-toast.warn{color:var(--orange);border-color:rgba(224,123,57,0.4);}
+.m-chunk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.m-chunk-btn{padding:14px 8px;border-radius:var(--radius);text-align:center;font-size:14px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);}
+.m-chunk-btn:active{transform:scale(0.95);}
+.m-chunk-btn.has-anchor{border-color:rgba(255,215,0,0.5);background:var(--gold-bg);color:var(--gold);}
+.m-chunk-sub{font-size:10px;font-weight:400;color:var(--muted);margin-top:3px;}
+
 </style>
 </head>
 <body>
+<div class="desktop-app">
+
 <header>
   <div class="logo">⚡ Pre-FC &amp; Surplus</div>
   <div class="header-stats">
@@ -416,6 +525,194 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+
+</div>
+
+<div class="mobile-app">
+  <div class="m-header">
+    <div class="m-logo">⚡ MoneyMap</div>
+    <span class="m-stat" id="m-hdr-t1" style="background:var(--gold-bg);color:var(--gold);border:1px solid rgba(255,215,0,0.3);">0★</span>
+    <span class="m-stat" id="m-hdr-surplus" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(63,185,80,0.3);">0S</span>
+    <span class="m-stat" id="m-hdr-auction" style="background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(210,153,34,0.3);">0A</span>
+    <span class="m-stat" id="m-hdr-fc" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,0.3);">0FC</span>
+  </div>
+  <div class="m-map-wrap" id="mobileMapWrap">
+    <div id="mobileMapPlaceholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;color:var(--muted);">
+      <div style="font-size:48px;">⚡</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);">MoneyMap</div>
+      <p style="font-size:13px;line-height:1.6;max-width:260px;">Tap <strong>Data</strong> below to enter your API key and upload your CSV files.</p>
+      <button class="btn" style="padding:14px 28px;font-size:15px;" onclick="mSwitchTab('data')">Open Data →</button>
+    </div>
+    <div id="mobileMap" style="width:100%;height:100%;display:none;"></div>
+    <div class="m-legend" id="mLegend" style="display:none;">
+      <div class="m-legend-item"><span class="dot dot-gold"></span>$100K+ Anchor</div>
+      <div class="m-legend-item"><span class="dot dot-green"></span>Surplus</div>
+      <div class="m-legend-item"><span class="dot dot-yellow"></span>Auction</div>
+      <div class="m-legend-item"><span class="dot dot-red"></span>Foreclosure</div>
+    </div>
+    <div class="m-fab-group" id="mFabGroup" style="display:none;">
+      <button class="m-fab accent" onclick="mLocateMe()">📍</button>
+      <button class="m-fab" onclick="mSwitchTab('route')" id="mFabRoute">🗺</button>
+    </div>
+  </div>
+  <div class="m-nav-bar">
+    <button class="m-nav-btn active" id="mnav-map" onclick="mSwitchTab('map')"><span class="m-nav-icon">🗺</span>Map</button>
+    <button class="m-nav-btn" id="mnav-list" onclick="mSwitchTab('list')"><span class="m-nav-icon">📋</span>List</button>
+    <button class="m-nav-btn" id="mnav-route" onclick="mSwitchTab('route')"><span class="m-nav-icon">🚗</span>Route</button>
+    <button class="m-nav-btn" id="mnav-filter" onclick="mSwitchTab('filter')"><span class="m-nav-icon">⚙️</span>Filters</button>
+    <button class="m-nav-btn" id="mnav-data" onclick="mSwitchTab('data')"><span class="m-nav-icon">📂</span>Data</button>
+  </div>
+  <div class="m-backdrop" id="mBackdrop" onclick="mCloseAllSheets()"></div>
+
+  <!-- DETAIL SHEET -->
+  <div class="m-sheet" id="mDetailSheet">
+    <div class="m-sheet-handle"></div>
+    <div class="m-sheet-header">
+      <span id="mDetailDot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0;"></span>
+      <div class="m-sheet-title" id="mDetailTitle">Property</div>
+      <button class="m-sheet-close" onclick="mCloseSheet('mDetailSheet')">✕</button>
+    </div>
+    <div class="m-sheet-body" id="mDetailBody"></div>
+    <div class="m-sheet-footer" id="mDetailFooter"></div>
+  </div>
+
+  <!-- LIST SHEET -->
+  <div class="m-sheet" id="mListSheet">
+    <div class="m-sheet-handle"></div>
+    <div class="m-sheet-header">
+      <div class="m-sheet-title">Properties <span id="mListCount" style="font-size:12px;color:var(--muted);font-weight:400;"></span></div>
+      <button class="m-sheet-close" onclick="mCloseSheet('mListSheet')">✕</button>
+    </div>
+    <div class="m-sheet-body">
+      <div class="m-chip-row" style="margin-bottom:10px;">
+        <span class="m-chip m-chip-gold" id="mLchip-t1" onclick="mToggleListFilter('t1only')">★</span>
+        <span class="m-chip m-chip-green" id="mLchip-surplus" onclick="mToggleListFilter('surplus')">Surplus</span>
+        <span class="m-chip m-chip-yellow" id="mLchip-auction" onclick="mToggleListFilter('auction')">Auctions</span>
+        <span class="m-chip m-chip-red" id="mLchip-fc" onclick="mToggleListFilter('fc')">FC</span>
+      </div>
+      <input type="text" class="m-filter-input" id="mSearchInput" placeholder="Search address or name..." oninput="mRenderList()" style="margin-bottom:10px;"/>
+      <div id="mPropertyList"><div class="m-empty">Upload data on the Data tab.</div></div>
+    </div>
+  </div>
+
+  <!-- ROUTE SHEET -->
+  <div class="m-sheet" id="mRouteSheet">
+    <div class="m-sheet-handle"></div>
+    <div class="m-sheet-header">
+      <div class="m-sheet-title">Route (<span id="mRouteCountSheet">0</span> stops)</div>
+      <button class="m-sheet-close" onclick="mCloseSheet('mRouteSheet')">✕</button>
+    </div>
+    <div class="m-sheet-body">
+      <div id="mLocStatus" style="font-size:12px;padding:8px 12px;border-radius:6px;margin-bottom:10px;display:none;"></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="btn" style="flex:1;padding:14px;font-size:14px;" onclick="mOptimizeFromLocation()">📍 Optimize from Location</button>
+        <button class="btn btn-ghost" style="padding:14px;" onclick="mClearRoute()">Clear</button>
+      </div>
+      <div id="mChunkSection" style="display:none;margin-bottom:14px;">
+        <div class="m-filter-label" style="margin-bottom:8px;">Tap chunk to open in Google Maps</div>
+        <div class="m-chunk-grid" id="mChunkButtons"></div>
+      </div>
+      <div id="mRouteList"><div class="m-empty">Add properties from the List, then optimize.</div></div>
+    </div>
+  </div>
+
+  <!-- FILTER SHEET -->
+  <div class="m-sheet" id="mFilterSheet">
+    <div class="m-sheet-handle"></div>
+    <div class="m-sheet-header">
+      <div class="m-sheet-title">Filters</div>
+      <button class="m-sheet-close" onclick="mCloseSheet('mFilterSheet')">✕</button>
+    </div>
+    <div class="m-sheet-body">
+      <div class="m-filter-section">
+        <div class="m-filter-label">★ Tier 1 Anchor Threshold ($)</div>
+        <input type="number" class="m-filter-input" id="mTierThreshold" value="100000" step="10000" onchange="mApplyFilters()"/>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">Surplus Amount Range</div>
+        <div class="m-filter-row">
+          <input type="number" class="m-filter-input" id="mSurplusMin" placeholder="Min $" onchange="mApplyFilters()"/>
+          <input type="number" class="m-filter-input" id="mSurplusMax" placeholder="Max $" onchange="mApplyFilters()"/>
+        </div>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">Pre-FC Equity Filter</div>
+        <div class="m-filter-row" style="align-items:center;">
+          <input type="number" class="m-filter-input" id="mEquityMin" placeholder="Min % (e.g. 30)" min="0" max="100" onchange="mApplyFilters()"/>
+          <span style="font-size:13px;color:var(--muted);white-space:nowrap;padding:0 6px;">% equity min</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">(Assessed Value − Final Judgment) / Assessed Value</div>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">Date Range</div>
+        <div class="m-filter-row">
+          <input type="date" class="m-filter-input" id="mDateFrom" onchange="mApplyFilters()"/>
+          <input type="date" class="m-filter-input" id="mDateTo" onchange="mApplyFilters()"/>
+        </div>
+        <div class="m-date-presets">
+          <button class="m-date-preset" onclick="mSetDatePreset(7)">7d</button>
+          <button class="m-date-preset" onclick="mSetDatePreset(14)">14d</button>
+          <button class="m-date-preset" onclick="mSetDatePreset(21)">21d</button>
+          <button class="m-date-preset" onclick="mSetDatePreset(30)">30d</button>
+          <button class="m-date-preset" onclick="mClearDates()">Clear</button>
+        </div>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">ZIP Code(s)</div>
+        <input type="text" class="m-filter-input" id="mZipFilter" placeholder="33309, 33139..." oninput="mApplyFilters()"/>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">City</div>
+        <input type="text" class="m-filter-input" id="mCityFilter" placeholder="e.g. Miami Gardens" oninput="mApplyFilters()"/>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">Surplus Max Age (days)</div>
+        <input type="number" class="m-filter-input" id="mMaxAge" placeholder="e.g. 60" onchange="mApplyFilters()"/>
+      </div>
+      <div class="m-filter-section">
+        <div class="m-filter-label">Show / Hide</div>
+        <div class="m-chip-row">
+          <span class="m-chip m-chip-gold" id="mChip-t1" onclick="mToggleMapFilter('t1only')">★ Anchors</span>
+          <span class="m-chip m-chip-green" id="mChip-surplus" onclick="mToggleMapFilter('surplus')">Surplus</span>
+          <span class="m-chip m-chip-yellow" id="mChip-auction" onclick="mToggleMapFilter('auction')">Auctions</span>
+          <span class="m-chip m-chip-red" id="mChip-fc" onclick="mToggleMapFilter('fc')">FC</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn" style="flex:1;padding:14px;" onclick="mApplyFilters();mSwitchTab('list');">Apply &amp; View List</button>
+        <button class="btn btn-ghost" style="padding:14px;" onclick="mClearAllFilters()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA SHEET -->
+  <div class="m-sheet" id="mDataSheet">
+    <div class="m-sheet-handle"></div>
+    <div class="m-sheet-header">
+      <div class="m-sheet-title">Data &amp; Settings</div>
+      <button class="m-sheet-close" onclick="mCloseSheet('mDataSheet')">✕</button>
+    </div>
+    <div class="m-sheet-body">
+      <div class="m-filter-section">
+        <div class="m-filter-label">Google Maps API Key</div>
+        <input type="text" class="m-filter-input" id="mApiKeyInput" placeholder="Paste API key..." style="margin-bottom:8px;"/>
+        <button class="btn" style="width:100%;padding:14px;font-size:15px;" onclick="mInitMap()">Load Map</button>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;">Key is saved — enter once per device.</div>
+      </div>
+      <div class="m-divider"></div>
+      <div class="m-filter-label">Upload CSV Files</div>
+      <div class="m-upload-card"><input type="file" accept=".csv" onchange="loadCSV(event,'surplus')"/><div class="m-upload-icon">🟢</div><div id="m-surplus-label" class="m-upload-text">Surplus Funds CSV</div></div>
+      <div class="m-upload-card"><input type="file" accept=".csv" onchange="loadCSV(event,'auction')"/><div class="m-upload-icon">🟡</div><div id="m-auction-label" class="m-upload-text">Upcoming Auctions CSV</div></div>
+      <div class="m-upload-card"><input type="file" accept=".csv" onchange="loadCSV(event,'fc')"/><div class="m-upload-icon">🔴</div><div id="m-fc-label" class="m-upload-text">Foreclosures / Lis Pendens CSV</div></div>
+      <div class="m-divider"></div>
+      <button class="btn btn-danger btn-sm" onclick="clearAllData()" style="width:100%;padding:14px;margin-bottom:6px;">🗑 Clear All Saved Data</button>
+      <div style="font-size:11px;color:var(--muted);">Notes are preserved when clearing CSV data.</div>
+    </div>
+  </div>
+
+  <div class="m-toast" id="mToast"></div>
+</div>
 
 <script>
 const SK={surplus:'prefc_surplus',auction:'prefc_auction',fc:'prefc_fc',apiKey:'prefc_apikey',geocoded:'prefc_geocoded',notes:'prefc_notes',filters:'prefc_filters'};
@@ -654,11 +951,35 @@ function normalizeRows(rows,type){
       base.status=r['Status']||'';base.plaintiffBid=r['Plaintiff Max Bid']||'';
       base.fcType=r['Type of foreclosure']||'';base.phones=[];base.emails=[];
     }else{
-      base.address=r['Address']||r['Property Address']||r['Street']||'';
-      base.city=r['City']||'';base.zip=(r['Zip']||r['ZIP']||r['Zip Code']||'').trim();base.county=r['County']||'';
+      base.address=titleCase((r['Address']||r['Property Address']||r['Street']||'').toLowerCase());
+      base.city=titleCase((r['City']||'').toLowerCase());
+      base.zip=(r['Zip']||r['ZIP']||r['Zip Code']||'').trim();
+      base.county=r['County']||'';
       base.ownerName=r['Owner Name']||r['Owner']||r['Defendant']||r['Name']||'';
       base.defaultAmount=r['Default Amount']||r['Amount']||r['Judgment']||'';
-      base.caseNumber=r['Case Number']||'';base.phones=[];base.emails=[];
+      base.finalJudgment=r['Final Judgment ($)']||r['Final Judgment']||'';
+      base.assessedValue=r['County Just Value ($)']||r['Assessed Value']||r['Just Value']||'';
+      base.estEquityDollar=r['Est. Equity ($)']||'';
+      base.estEquityPct=r['Est. Equity (%)']||'';
+      base.caseNumber=r['Case Number']||'';
+      base.parcel=r['Parcel ID']||r['Parcel Number']||'';
+      base.saleDate=r['Sale Date']||'';
+      base.status=r['Status']||'';
+      base.firstSeen=r['First Seen']||'';
+      // Mailing address
+      base.mailStreet=titleCase((r['Mailing Address']||'').toLowerCase());
+      base.mailCity=titleCase((r['Mailing City']||'').toLowerCase());
+      base.mailState=(r['Mailing State']||'FL').trim().toUpperCase();
+      base.mailZip=(r['Mailing Zip']||'').trim();
+      const fcPropKey=(base.address+base.zip).replace(/\s/g,'').toLowerCase();
+      const fcMailKey=(base.mailStreet+base.mailZip).replace(/\s/g,'').toLowerCase();
+      base._addressesDiffer=!!(base.mailStreet&&fcPropKey!==fcMailKey);
+      base._outOfState=!!(base.mailState&&base.mailState!=='FL');
+      base._propFullAddress=base.address+', '+base.city+', FL '+base.zip;
+      base._mailFullAddress=base.mailStreet+', '+base.mailCity+', '+base.mailState+' '+base.mailZip;
+      // Pre-calc equity for filter
+      base._equityPct=parseFloat((base.estEquityPct||'').replace('%',''))||null;
+      base.phones=[];base.emails=[];
     }
     // _fullAddress used for geocoding — always use property address with correct state
     const addrState=base.state||'FL';
@@ -753,7 +1074,7 @@ function renderList(){
       <div class="pc-meta">
         ${p._type==='surplus'?`<span class="pc-tag" style="background:${p._tier1?'var(--gold-bg)':'var(--green-bg)'};color:${p._tier1?'var(--gold)':'var(--green)'};">${p.surplusAmount}</span>`:''}
         ${p._type==='auction'?`<span class="pc-tag" style="background:var(--yellow-bg);color:var(--yellow);">${p.saleDate}</span>`:''}
-        ${p._type==='fc'?`<span class="pc-tag" style="background:var(--red-bg);color:var(--red);">${p.defaultAmount||'Lis Pendens'}</span>`:''}
+        ${p._type==='fc'?`<span class="pc-tag" style="background:var(--red-bg);color:var(--red);">${p.finalJudgment||p.defaultAmount||'Pre-FC'}</span><span class="pc-tag" style="background:${calcEquity(p)>=30?'var(--green-bg)':'var(--red-bg)'};color:${calcEquity(p)>=30?'var(--green)':'var(--red)'};">${p.estEquityPct||''}</span>`:''}
         ${tier1Tag}${outlierTag}${oosTag}${diffAddrTag}${deceasedTag}
         <span class="pc-tag" style="background:var(--surface3);color:var(--muted);">${p.county}</span>
       </div>
@@ -825,7 +1146,16 @@ function showPopup(id){
     body+=di('Sale Date',p.saleDate+(p._expired?' (Past)':''),'yellow');body+=di('Status',p.status);
     body+=di('Final Judgment',p.finalJudgment,'red');body+=di('Assessed Value',p.assessedValue);
     body+=di('Plaintiff Bid',p.plaintiffBid);body+=di('FC Type',p.fcType);
-  }else{body+=di('Default Amount',p.defaultAmount,'red');}
+  }else{
+    body+=di('Final Judgment',p.finalJudgment||p.defaultAmount,'red');
+    body+=di('Just Value',p.assessedValue);
+    const eq2=calcEquity(p);
+    if(eq2!==null)body+=di('Est. Equity',p.estEquityPct||eq2+'%',eq2>=30?'green':'red');
+    if(p.estEquityDollar)body+=di('Equity ($)',p.estEquityDollar,'green');
+    body+=di('Sale Date',p.saleDate,'yellow');
+    body+=di('Status',p.status);
+    body+=di('First Seen',p.firstSeen);
+  }
   body+='</div>';
   // Address section for surplus — show dual address logic
   if(p._type==='surplus'){
@@ -1150,6 +1480,404 @@ window.addEventListener('DOMContentLoaded',()=>{
   const savedKey=localStorage.getItem(SK.apiKey);
   if(savedKey){document.getElementById('apiKeyInput').value=savedKey;const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${savedKey}&libraries=drawing,geometry&callback=onMapReady`;document.head.appendChild(s);}
 });
+
+
+// ═══════════════════════════════════════
+// MOBILE APP LOGIC
+// ═══════════════════════════════════════
+const IS_MOBILE = window.innerWidth <= 900;
+let mobileGoogleMap = null;
+let mobileMarkers = [];
+let mCurrentPropId = null;
+let mChunks = [], mCurrentChunk = 0;
+const M_FILTERS = { fc:true, auction:true, surplus:true, t1only:false };
+const M_LIST_FILTERS = { fc:true, auction:true, surplus:true, t1only:false };
+let MAF = { surplusMin:null, surplusMax:null, dateFrom:null, dateTo:null, zip:'', city:'', maxAge:null, tierThreshold:100000, equityMin:null };
+const M_CHUNK_SIZE = 10;
+const STATUSES_M = ['Answered','Not Home','Not Interested','Call Back','Signed'];
+const STATUS_CLS_M = ['answered','nothome','notint','callback','signed'];
+
+function mToast(msg,type=''){const el=document.getElementById('mToast');if(!el)return;el.textContent=msg;el.className='m-toast show '+type;setTimeout(()=>el.className='m-toast',3000);}
+
+function mSwitchTab(tab){
+  document.querySelectorAll('.m-nav-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('mnav-'+tab);if(btn)btn.classList.add('active');
+  mCloseAllSheets();
+  if(tab==='list'){mRenderList();mOpenSheet('mListSheet');}
+  else if(tab==='route'){mUpdateRouteUI();mOpenSheet('mRouteSheet');}
+  else if(tab==='filter')mOpenSheet('mFilterSheet');
+  else if(tab==='data')mOpenSheet('mDataSheet');
+}
+
+function mOpenSheet(id){document.getElementById(id).classList.add('open');document.getElementById('mBackdrop').classList.add('show');}
+function mCloseSheet(id){document.getElementById(id).classList.remove('open');if(!document.querySelectorAll('.m-sheet.open').length)document.getElementById('mBackdrop').classList.remove('show');}
+function mCloseAllSheets(){document.querySelectorAll('.m-sheet').forEach(s=>s.classList.remove('open'));document.getElementById('mBackdrop').classList.remove('show');document.querySelectorAll('.m-nav-btn').forEach(b=>b.classList.remove('active'));const mb=document.getElementById('mnav-map');if(mb)mb.classList.add('active');}
+
+function mUpdateHeaderStats(){
+  if(!IS_MOBILE)return;
+  const t1=DATA.surplus.filter(p=>!p._duplicate&&!p._hidden&&p._tier1).length;
+  const s=document.getElementById('m-hdr-t1');if(s)s.textContent=t1+'★';
+  const s2=document.getElementById('m-hdr-surplus');if(s2)s2.textContent=DATA.surplus.filter(p=>!p._duplicate&&!p._hidden).length+'S';
+  const s3=document.getElementById('m-hdr-auction');if(s3)s3.textContent=DATA.auction.filter(p=>!p._duplicate&&!p._hidden).length+'A';
+  const s4=document.getElementById('m-hdr-fc');if(s4)s4.textContent=DATA.fc.filter(p=>!p._duplicate&&!p._hidden).length+'FC';
+  ['surplus','auction','fc'].forEach(type=>{
+    const main=document.getElementById(type+'-label');const mob=document.getElementById('m-'+type+'-label');
+    if(main&&mob){mob.textContent=main.textContent;mob.className=main.className.includes('upload-name')?'m-upload-done':'m-upload-text';}
+  });
+}
+
+function mApplyFilters(){
+  MAF.tierThreshold=parseFloat(document.getElementById('mTierThreshold').value)||100000;
+  MAF.surplusMin=parseFloat(document.getElementById('mSurplusMin').value)||null;
+  MAF.surplusMax=parseFloat(document.getElementById('mSurplusMax').value)||null;
+  MAF.dateFrom=document.getElementById('mDateFrom').value||null;
+  MAF.dateTo=document.getElementById('mDateTo').value||null;
+  MAF.zip=document.getElementById('mZipFilter').value.trim();
+  MAF.city=document.getElementById('mCityFilter').value.toLowerCase().trim();
+  MAF.maxAge=parseInt(document.getElementById('mMaxAge').value)||null;
+  MAF.equityMin=parseFloat(document.getElementById('mEquityMin').value)||null;
+  AF.tierThreshold=MAF.tierThreshold;AF.surplusMin=MAF.surplusMin;AF.surplusMax=MAF.surplusMax;
+  AF.dateFrom=MAF.dateFrom;AF.dateTo=MAF.dateTo;AF.maxAge=MAF.maxAge;
+  DATA.surplus.forEach(p=>p._tier1=surplusVal(p)>=MAF.tierThreshold);
+  mUpdateHeaderStats();mRenderList();mRefreshMarkers();
+}
+
+function mClearAllFilters(){
+  ['mTierThreshold','mSurplusMin','mSurplusMax','mDateFrom','mDateTo','mZipFilter','mCityFilter','mMaxAge','mEquityMin'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='mTierThreshold'?'100000':'';});
+  MAF={surplusMin:null,surplusMax:null,dateFrom:null,dateTo:null,zip:'',city:'',maxAge:null,tierThreshold:100000,equityMin:null};
+  mApplyFilters();mToast('Filters cleared');
+}
+
+function mSetDatePreset(days){const from=new Date();const to=new Date();to.setDate(to.getDate()+days);document.getElementById('mDateFrom').value=from.toISOString().slice(0,10);document.getElementById('mDateTo').value=to.toISOString().slice(0,10);mApplyFilters();}
+function mClearDates(){document.getElementById('mDateFrom').value='';document.getElementById('mDateTo').value='';mApplyFilters();}
+
+function mToggleMapFilter(type){M_FILTERS[type]=!M_FILTERS[type];document.getElementById('mChip-'+type)?.classList.toggle('off',!M_FILTERS[type]);mRefreshMarkers();}
+function mToggleListFilter(type){M_LIST_FILTERS[type]=!M_LIST_FILTERS[type];document.getElementById('mLchip-'+type)?.classList.toggle('off',!M_LIST_FILTERS[type]);mRenderList();}
+
+function calcEquity(p){
+  if(p._type!=='fc')return null;
+  // Use pre-calculated equity from CSV if available
+  if(p._equityPct!==null&&p._equityPct!==undefined)return Math.round(p._equityPct);
+  // Fallback: calculate from values
+  const av=parseFloat((p.assessedValue||p.estEquityDollar||'').replace(/[$,]/g,''));
+  const fj=parseFloat((p.finalJudgment||p.defaultAmount||'').replace(/[$,]/g,''));
+  if(!av||!fj||av<=0)return null;
+  return Math.round((av-fj)/av*100);
+}
+
+function mPassesFilter(p){
+  if(p._duplicate||p._hidden)return false;
+  if(!passesFilter(p))return false;
+  if(MAF.equityMin!==null&&p._type==='fc'){const eq=calcEquity(p);if(eq===null||eq<MAF.equityMin)return false;}
+  if(MAF.zip){const zips=MAF.zip.split(',').map(z=>z.trim()).filter(Boolean);if(zips.length&&!zips.includes(p.zip))return false;}
+  if(MAF.city&&!p.city.toLowerCase().includes(MAF.city))return false;
+  return true;
+}
+
+function mGetAllVisible(){
+  const q=(document.getElementById('mSearchInput')?.value||'').toLowerCase();
+  const all=[];
+  ['fc','auction','surplus'].forEach(type=>{
+    if(!M_LIST_FILTERS[type])return;
+    DATA[type].forEach(p=>{
+      if(!mPassesFilter(p))return;
+      if(M_LIST_FILTERS.t1only&&!p._tier1)return;
+      if(q&&!(p.address.toLowerCase().includes(q)||(p.ownerName||'').toLowerCase().includes(q)))return;
+      all.push(p);
+    });
+  });
+  all.sort((a,b)=>{if(a._tier1&&!b._tier1)return-1;if(!a._tier1&&b._tier1)return 1;return surplusVal(b)-surplusVal(a);});
+  return all;
+}
+
+function mRenderList(){
+  const list=document.getElementById('mPropertyList');if(!list)return;
+  const items=mGetAllVisible();
+  const lc=document.getElementById('mListCount');if(lc)lc.textContent='('+items.length+')';
+  if(!items.length){list.innerHTML='<div class="m-empty">No properties match your filters.</div>';return;}
+  const colors={fc:'red',auction:'yellow',surplus:'green'};
+  list.innerHTML=items.map(p=>{
+    const c=p._tier1?'gold':colors[p._type];
+    const inRoute=ROUTE.find(r=>r._id===p._id);
+    const n=NOTES[p._id]||{};
+    const eq=calcEquity(p);
+    const eqTag=eq!==null?`<span class="m-tag" style="background:${eq>=30?'var(--green-bg)':'var(--surface3)'};color:${eq>=30?'var(--green)':'var(--muted)'};">${eq}% eq</span>`:'';
+    return`<div class="m-prop-card ${p._tier1?'t1':''} ${inRoute?'in-route':''}">
+      <div class="m-prop-addr"><span class="dot dot-${c}" style="flex-shrink:0;margin-top:0;"></span>${p.address}${p._tier1?' ★':''}</div>
+      <div class="m-prop-owner">${p.ownerName||'Owner unknown'} &bull; ${p.city} ${p.zip}</div>
+      <div class="m-prop-tags">
+        ${p._type==='surplus'?`<span class="m-tag" style="background:${p._tier1?'var(--gold-bg)':'var(--green-bg)'};color:${p._tier1?'var(--gold)':'var(--green)'};">${p.surplusAmount}</span>`:''}
+        ${p._type==='auction'?`<span class="m-tag" style="background:var(--yellow-bg);color:var(--yellow);">${p.saleDate}</span>`:''}
+        ${p._type==='fc'?`<span class="m-tag" style="background:var(--red-bg);color:var(--red);">${p.defaultAmount||'Lis Pendens'}</span>`:''}
+        ${eqTag}
+        ${p._outOfState?`<span class="m-tag" style="background:rgba(88,166,255,0.1);color:var(--accent);">✈${p.mailState}</span>`:''}
+        ${n.status?`<span class="m-tag" style="background:var(--surface3);color:var(--muted);">${n.status}</span>`:''}
+      </div>
+      <div class="m-prop-actions">
+        <button class="m-prop-btn" style="background:var(--surface3);border:1px solid var(--border);color:var(--text);" onclick="mShowDetail('${p._id}')">Details</button>
+        ${inRoute
+          ?`<button class="m-prop-btn" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,0.3);" onclick="mRemoveFromRoute('${p._id}')">Remove</button>`
+          :`<button class="m-prop-btn" style="${p._tier1?'background:var(--gold);color:#000;':'background:var(--accent);color:#000;'}border:none;" onclick="mAddToRoute('${p._id}')">+ Route</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mShowDetail(id){
+  const p=findById(id);if(!p)return;
+  mCurrentPropId=id;
+  const n=NOTES[id]||{};
+  const dotColor=p._tier1?'var(--gold)':p._outlier?'var(--orange)':{fc:'var(--red)',auction:'var(--yellow)',surplus:'var(--green)'}[p._type];
+  document.getElementById('mDetailDot').style.background=dotColor;
+  document.getElementById('mDetailTitle').textContent=p.address+(p._tier1?' ★':'');
+  let body='';
+  if(p._outOfState)body+=`<div class="m-oos-warn">⚠ Out-of-State Owner — ${p.mailCity}, ${p.mailState}. Phone/email recommended.</div>`;
+  if(p._addressesDiffer){
+    body+=`<div class="m-addr-cards">
+      <div class="m-addr-card"><div class="m-addr-label" style="color:var(--green);">🚪 Knock Here</div><div class="m-addr-text">${p.mailStreet||p.address}</div><div class="m-addr-sub">${p.mailCity||p.city}, ${p.mailState||'FL'} ${p.mailZip||p.zip}</div></div>
+      <div class="m-addr-card"><div class="m-addr-label">🏠 Property</div><div class="m-addr-text">${p.address}</div><div class="m-addr-sub">${p.city}, FL ${p.zip}</div></div>
+    </div>`;
+  }
+  body+='<div class="m-detail-grid">';
+  body+=mDi('Owner',p.ownerName||'Unknown');body+=mDi('County',p.county);
+  body+=mDi('Case #',p.caseNumber);body+=mDi('Parcel',p.parcel||'—');
+  if(p._type==='surplus'){
+    body+=mDi('Date Sold',p.dateSold);body+=mDi('FC Type',p.fcType);
+    body+=mDi('Opening Bid',p.openingBid);body+=mDi('Closing Bid',p.closingBid);
+    body+=mDi('Surplus Amount',p.surplusAmount,p._tier1?'gold':'green');
+  }else if(p._type==='auction'){
+    body+=mDi('Sale Date',p.saleDate,'yellow');body+=mDi('Status',p.status);
+    body+=mDi('Final Judgment',p.finalJudgment,'red');body+=mDi('Assessed Value',p.assessedValue);
+    body+=mDi('Plaintiff Bid',p.plaintiffBid);
+  }else{
+    body+=mDi('Final Judgment',p.finalJudgment||p.defaultAmount,'red');
+    body+=mDi('Just Value',p.assessedValue);
+    const eq=calcEquity(p);
+    if(eq!==null)body+=mDi('Est. Equity',p.estEquityPct||eq+'%',eq>=30?'green':'red');
+    if(p.estEquityDollar)body+=mDi('Equity ($)',p.estEquityDollar,'green');
+    body+=mDi('Sale Date',p.saleDate,'yellow');
+    body+=mDi('Status',p.status);
+  }
+  body+='</div>';
+  if(p.phones&&p.phones.length){
+    body+='<div class="m-section-title">Phone Numbers</div><div class="m-phone-list">';
+    p.phones.forEach(ph=>{
+      if(!ph.num)return;
+      const num=String(ph.num).replace(/\.0$/,'').replace(/[^\d]/g,'');
+      const disp=num.length===10?`(${num.slice(0,3)}) ${num.slice(3,6)}-${num.slice(6)}`:ph.num;
+      body+=`<div class="m-phone-item"><div class="m-phone-info"><a href="tel:${num}" class="m-phone-num">${disp}</a><div class="m-phone-type">${ph.type||''}${ph.dnc==='Y'?' <span class="m-dnc">DNC</span>':''}</div></div><a href="tel:${num}" class="m-call-btn">📞</a></div>`;
+    });
+    body+='</div>';
+  }
+  if(p.emails&&p.emails.length){
+    body+='<div class="m-section-title">Email</div>';
+    p.emails.forEach(e=>{body+=`<a href="mailto:${e}" style="display:block;font-size:14px;color:var(--accent);padding:6px 0;">${e}</a>`;});
+  }
+  if(p.relatives&&p.relatives.length){
+    body+=`<div class="m-section-title" style="cursor:pointer;" onclick="var r=document.getElementById('mRel${id.replace(/[^a-z0-9]/gi,'_')}');r.style.display=r.style.display==='none'?'block':'none'">Relatives (${p.relatives.length}) ▾</div>`;
+    body+=`<div id="mRel${id.replace(/[^a-z0-9]/gi,'_')}" style="display:none;">`;
+    p.relatives.forEach(rel=>{
+      body+=`<div style="margin-bottom:10px;padding:10px;background:var(--surface2);border-radius:var(--radius);"><div style="font-size:13px;font-weight:700;margin-bottom:6px;">${rel.name} <span style="font-size:11px;color:var(--muted);font-weight:400;">${rel.relation}${rel.age?' • Age '+rel.age:''}</span></div>`;
+      rel.phones.forEach(ph=>{if(!ph.num)return;const num=String(ph.num).replace(/\.0$/,'').replace(/[^\d]/g,'');const disp=num.length===10?`(${num.slice(0,3)}) ${num.slice(3,6)}-${num.slice(6)}`:ph.num;body+=`<div class="m-phone-item" style="padding:8px;margin-bottom:4px;"><div class="m-phone-info"><a href="tel:${num}" class="m-phone-num" style="font-size:14px;">${disp}</a><div class="m-phone-type">${ph.type||''}</div></div><a href="tel:${num}" class="m-call-btn">📞</a></div>`;});
+      body+='</div>';
+    });
+    body+='</div>';
+  }
+  body+='<div class="m-section-title">Door Knock Status</div><div class="m-status-grid">';
+  STATUSES_M.forEach((s,i)=>{body+=`<button class="m-status-btn m-status-${STATUS_CLS_M[i]} ${n.status===s?'sel':''} ${s==='Signed'?'m-status-signed':''}" onclick="mSetStatus('${id}','${s}',${i})">${s}</button>`;});
+  body+='</div>';
+  body+=`<div class="m-section-title">Field Notes</div><textarea class="m-notes-input" id="mNoteInput" placeholder="What happened, best time to call, gate code...">${n.note||''}</textarea>`;
+  document.getElementById('mDetailBody').innerHTML=body;
+  const inRoute=ROUTE.find(r=>r._id===p._id);
+  const knockAddr=p._mailFullAddress||p._fullAddress||p._propFullAddress;
+  const propAddr=p._propFullAddress||p._fullAddress;
+  document.getElementById('mDetailFooter').innerHTML=`
+    <a href="https://maps.google.com/?daddr=${encodeURIComponent(knockAddr)}&dirflg=d" target="_blank" class="btn" style="flex:1;text-align:center;padding:14px;font-size:14px;text-decoration:none;">🚗 Navigate</a>
+    ${p._addressesDiffer&&!p._outOfState?`<a href="https://maps.google.com/?daddr=${encodeURIComponent(propAddr)}&dirflg=d" target="_blank" class="btn btn-ghost" style="padding:14px;text-decoration:none;">🏠</a>`:''}
+    ${inRoute?`<button class="btn btn-danger" style="padding:14px;" onclick="mRemoveFromRoute('${id}')">Remove</button>`:`<button class="btn ${p._tier1?'':'btn-ghost'}" style="${p._tier1?'background:var(--gold);color:#000;':''}padding:14px;" onclick="mAddToRoute('${id}')">+ Route</button>`}
+    <button class="btn btn-ghost" style="padding:14px;" onclick="mSaveNote('${id}')">💾</button>
+  `;
+  mCloseAllSheets();mOpenSheet('mDetailSheet');
+}
+
+function mDi(label,val,colorClass=''){if(!val||val==='nan')val='—';return`<div class="m-detail-item"><label>${label}</label><span class="val${colorClass?' val-'+colorClass:''}">${val}</span></div>`;}
+
+function mSetStatus(id,status,idx){
+  if(!NOTES[id])NOTES[id]={};
+  NOTES[id].status=NOTES[id].status===status?null:status;
+  saveNotes();
+  const m=mobileMarkers.find(mk=>mk._data&&mk._data._id===id);
+  if(m){const c=mMarkerColor(m._data);m.setIcon({path:google.maps.SymbolPath.CIRCLE,scale:m._data._tier1?13:10,fillColor:c,fillOpacity:0.95,strokeColor:'#fff',strokeWeight:2});}
+  document.querySelectorAll('.m-status-btn').forEach((btn,i)=>{btn.classList.toggle('sel',NOTES[id].status===STATUSES_M[i]);});
+  mToast(NOTES[id].status||'Status cleared','success');
+}
+
+function mSaveNote(id){const inp=document.getElementById('mNoteInput');if(!inp)return;if(!NOTES[id])NOTES[id]={};NOTES[id].note=inp.value.trim();saveNotes();mToast('Notes saved','success');}
+
+function mAddToRoute(id){const p=findById(id);if(!p)return;if(ROUTE.find(r=>r._id===id)){mToast('Already in route');return;}ROUTE.push(p);p._inRoute=true;mChunks=[];mUpdateRouteUI();mRenderList();mToast((p._tier1?'★ Anchor':'Stop')+' added','success');}
+function mRemoveFromRoute(id){const idx=ROUTE.findIndex(r=>r._id===id);if(idx>-1){ROUTE[idx]._inRoute=false;ROUTE.splice(idx,1);}mChunks=[];mUpdateRouteUI();mRenderList();}
+function mClearRoute(){ROUTE.forEach(p=>p._inRoute=false);ROUTE.length=0;mChunks=[];mUpdateRouteUI();mRenderList();}
+
+function mOptimizeFromLocation(){
+  if(!ROUTE.length){mToast('Add stops first');return;}
+  const locEl=document.getElementById('mLocStatus');
+  locEl.style.cssText='display:block;background:var(--green-bg);color:var(--green);border-radius:6px;padding:8px 12px;';
+  locEl.textContent='Getting your location...';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat=pos.coords.latitude;currentLng=pos.coords.longitude;
+    locEl.textContent='📍 Optimizing...';
+    const sortGroup=(group,sLat,sLng)=>{const rem=[...group];const sorted=[];let cLat=sLat,cLng=sLng;while(rem.length){let best=null,bestD=Infinity,bIdx=0;rem.forEach((p,i)=>{if(p._lat&&p._lng){const d=dist(cLat,cLng,p._lat,p._lng);if(d<bestD){bestD=d;best=p;bIdx=i;}}});if(!best){sorted.push(...rem.sort((a,b)=>a.zip.localeCompare(b.zip)));break;}sorted.push(best);cLat=best._lat;cLng=best._lng;rem.splice(bIdx,1);}return sorted;};
+    const t1=ROUTE.filter(p=>p._tier1);const fills=ROUTE.filter(p=>!p._tier1);
+    const sT1=sortGroup(t1,currentLat,currentLng);
+    const lastT1=sT1.length?sT1[sT1.length-1]:null;
+    const sFills=sortGroup(fills,lastT1?lastT1._lat||currentLat:currentLat,lastT1?lastT1._lng||currentLng:currentLng);
+    const final=[];const used=new Set();
+    sT1.forEach(anchor=>{final.push(anchor);if(!anchor._lat)return;sFills.forEach(f=>{if(used.has(f._id)||!f._lat)return;if(dist(anchor._lat,anchor._lng,f._lat,f._lng)<2.5){final.push(f);used.add(f._id);}});});
+    sFills.filter(f=>!used.has(f._id)).forEach(f=>final.push(f));
+    ROUTE.length=0;final.forEach(p=>ROUTE.push(p));
+    mBuildChunks();mUpdateRouteUI();
+    if(mobileGoogleMap){mobileGoogleMap.setCenter({lat:currentLat,lng:currentLng});mobileGoogleMap.setZoom(13);}
+    locEl.textContent='✓ '+ROUTE.length+' stops optimized';
+    mToast('Route optimized','success');
+  },()=>{
+    locEl.style.cssText='display:block;background:var(--red-bg);color:var(--red);border-radius:6px;padding:8px 12px;';
+    locEl.textContent='Location unavailable — sorted by area';
+    const sorted=[...ROUTE].sort((a,b)=>{if(a._tier1&&!b._tier1)return-1;if(!a._tier1&&b._tier1)return 1;return a.zip.localeCompare(b.zip);});
+    ROUTE.length=0;sorted.forEach(p=>ROUTE.push(p));mBuildChunks();mUpdateRouteUI();
+  },{enableHighAccuracy:true,timeout:10000});
+}
+
+function mBuildChunks(){mChunks=[];for(let i=0;i<ROUTE.length;i+=M_CHUNK_SIZE)mChunks.push(ROUTE.slice(i,i+M_CHUNK_SIZE));mCurrentChunk=0;}
+
+function mOpenChunk(idx){
+  mCurrentChunk=idx;const stops=mChunks[idx];
+  const kAddr=p=>p._type==='surplus'?(p._mailFullAddress||p._fullAddress):p._fullAddress;
+  const origin=currentLat&&currentLng?`${currentLat},${currentLng}`:encodeURIComponent(kAddr(stops[0]));
+  const dest=encodeURIComponent(kAddr(stops[stops.length-1]));
+  const wps=stops.slice(0,-1).map(p=>encodeURIComponent(kAddr(p))).join('|');
+  let url=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+  if(wps)url+='&waypoints='+wps;
+  window.open(url,'_blank');
+}
+
+function mUpdateRouteUI(){
+  const cnt=document.getElementById('mRouteCountSheet');if(cnt)cnt.textContent=ROUTE.length;
+  const list=document.getElementById('mRouteList');if(!list)return;
+  if(!ROUTE.length){list.innerHTML='<div class="m-empty">Add properties from the List, then optimize.</div>';document.getElementById('mChunkSection').style.display='none';return;}
+  if(mChunks.length){
+    document.getElementById('mChunkSection').style.display='block';
+    document.getElementById('mChunkButtons').innerHTML=mChunks.map((ch,i)=>{
+      const s=i*M_CHUNK_SIZE+1,e=s+ch.length-1,hasT1=ch.some(p=>p._tier1);
+      return`<button class="m-chunk-btn ${hasT1?'has-anchor':''}" onclick="mOpenChunk(${i})">${hasT1?'★ ':''}Chunk ${i+1}<div class="m-chunk-sub">Stops ${s}–${e}</div></button>`;
+    }).join('');
+  }else{document.getElementById('mChunkSection').style.display='none';}
+  list.innerHTML=ROUTE.map((p,i)=>{
+    const n=NOTES[p._id]||{};
+    return`<div class="m-route-item ${p._tier1?'t1r':''}">
+      <div class="m-route-num ${p._tier1?'gn':''}">${p._tier1?'★':i+1}</div>
+      <div class="m-route-info"><div class="m-route-addr">${p.address}</div><div class="m-route-sub">${n.status||'Not visited'} • ${p.city} • Chunk ${Math.floor(i/M_CHUNK_SIZE)+1}</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="mRemoveFromRoute('${p._id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function mInitMap(){
+  const key=document.getElementById('mApiKeyInput')?.value.trim();
+  if(!key){mToast('Enter your API key');return;}
+  localStorage.setItem(SK.apiKey,key);
+  if(typeof google!=='undefined'&&google.maps){mOnMapReady();return;}
+  const s=document.createElement('script');
+  s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&libraries=drawing,geometry&callback=mOnMapReadyCallback`;
+  s.onerror=()=>mToast('Map failed to load');
+  document.head.appendChild(s);
+}
+
+window.mOnMapReadyCallback=function(){mOnMapReady();};
+
+function mOnMapReady(){
+  const ph=document.getElementById('mobileMapPlaceholder');
+  const md=document.getElementById('mobileMap');
+  if(!ph||!md)return;
+  ph.style.display='none';md.style.display='block';
+  const leg=document.getElementById('mLegend');if(leg)leg.style.display='block';
+  const fab=document.getElementById('mFabGroup');if(fab)fab.style.display='flex';
+  mobileGoogleMap=new google.maps.Map(md,{
+    center:{lat:26.0,lng:-80.2},zoom:11,
+    styles:darkStyles(),
+    disableDefaultUI:true,
+    gestureHandling:'greedy',
+    zoomControl:true,
+    zoomControlOptions:{position:google.maps.ControlPosition.RIGHT_CENTER}
+  });
+  mPlotAllMarkers();
+}
+
+function mPlotAllMarkers(){
+  mobileMarkers.forEach(m=>m.setMap(null));mobileMarkers=[];
+  ['surplus','auction','fc'].forEach(type=>{
+    DATA[type].filter(p=>p.address&&!p._duplicate&&!p._hidden).forEach(p=>{
+      if(geocodeCache[p._id]){p._lat=geocodeCache[p._id].lat;p._lng=geocodeCache[p._id].lng;mPlaceMarker(p,geocodeCache[p._id]);}
+    });
+  });
+}
+
+function mMarkerColor(p){
+  const n=NOTES[p._id];
+  if(n&&n.status){const sc={answered:'#3fb950',nothome:'#8b949e',notint:'#f85149',callback:'#d29922',signed:'#58a6ff'};return sc[STATUS_CLS_M[STATUSES_M.indexOf(n.status)]]||'#8b949e';}
+  if(p._outlier)return'#e07b39';if(p._tier1)return'#ffd700';
+  return{fc:'#f85149',auction:'#d29922',surplus:'#3fb950'}[p._type];
+}
+
+function mPlaceMarker(p,latlng){
+  if(!mobileGoogleMap)return;
+  const marker=new google.maps.Marker({
+    position:latlng,map:mobileGoogleMap,title:p.address,
+    icon:{path:google.maps.SymbolPath.CIRCLE,scale:p._tier1?14:10,fillColor:mMarkerColor(p),fillOpacity:0.95,strokeColor:'#fff',strokeWeight:p._tier1?2.5:2},
+    zIndex:p._tier1?10:1
+  });
+  marker._data=p;marker.addListener('click',()=>mShowDetail(p._id));
+  mobileMarkers.push(marker);if(!mShouldShow(p))marker.setVisible(false);
+}
+
+function mShouldShow(p){
+  if(!M_FILTERS[p._type]||p._duplicate||p._hidden)return false;
+  if(M_FILTERS.t1only&&!p._tier1)return false;
+  return mPassesFilter(p);
+}
+function mRefreshMarkers(){mobileMarkers.forEach(m=>m.setVisible(mShouldShow(m._data)));}
+
+function mLocateMe(){
+  if(!mobileGoogleMap){mToast('Load the map first');return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const ll={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    mobileGoogleMap.setCenter(ll);mobileGoogleMap.setZoom(14);
+    new google.maps.Marker({position:ll,map:mobileGoogleMap,title:'You',icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:'#58a6ff',fillOpacity:1,strokeColor:'#fff',strokeWeight:2.5}});
+    mCloseAllSheets();
+  },()=>mToast('Could not get location'));
+}
+
+// Sync geocoded pins to mobile map as they process
+const _origPlaceMarkerDesktop=window.placeMarker;
+window.placeMarker=function(p,latlng){if(_origPlaceMarkerDesktop)_origPlaceMarkerDesktop(p,latlng);if(mobileGoogleMap)mPlaceMarker(p,latlng);};
+
+// Mobile boot
+window.addEventListener('load',()=>{
+  if(!IS_MOBILE)return;
+  mUpdateHeaderStats();
+  const savedKey=localStorage.getItem(SK.apiKey);
+  if(savedKey){
+    const inp=document.getElementById('mApiKeyInput');if(inp)inp.value=savedKey;
+    if(typeof google!=='undefined'&&google.maps){mOnMapReady();}
+    else{const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${savedKey}&libraries=drawing,geometry&callback=mOnMapReadyCallback`;document.head.appendChild(s);}
+  }
+  // Patch loadCSV to sync mobile labels after upload
+  const _origLoad=window.loadCSV;
+  window.loadCSV=function(event,type){
+    _origLoad(event,type);
+    setTimeout(()=>{mUpdateHeaderStats();if(mobileGoogleMap){mobileMarkers=mobileMarkers.filter(m=>{if(m._data._type===type){m.setMap(null);return false;}return true;});DATA[type].filter(p=>p.address&&!p._duplicate&&!p._hidden&&geocodeCache[p._id]).forEach(p=>{p._lat=geocodeCache[p._id].lat;p._lng=geocodeCache[p._id].lng;mPlaceMarker(p,geocodeCache[p._id]);});}},800);
+  };
+});
+
 </script>
 </body>
 </html>
